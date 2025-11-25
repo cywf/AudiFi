@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { getPlans, getCurrentUserPlan } from '@/api/subscription'
 import { startSubscriptionCheckout } from '@/lib/payments'
 import type { SubscriptionPlan } from '@/types'
+import { Question } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 export function PricingPage() {
@@ -54,12 +55,12 @@ export function PricingPage() {
 
   return (
     <MainLayout>
-      <div className="max-w-6xl mx-auto space-y-10 md:space-y-12">
-        <div className="text-center space-y-3 md:space-y-4">
+      <div className="max-w-6xl mx-auto space-y-12 md:space-y-16">
+        <div className="text-center space-y-4 md:space-y-5 pt-4">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
             Simple, transparent pricing
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Start for free, upgrade when you're ready to scale. No hidden fees.
           </p>
         </div>
@@ -82,9 +83,9 @@ export function PricingPage() {
           </div>
         )}
 
-        <div className="border-t border-border/60 pt-10 md:pt-12">
-          <h2 className="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8">Frequently Asked Questions</h2>
-          <div className="max-w-3xl mx-auto space-y-6">
+        <div className="border-t border-border/60 pt-12 md:pt-16">
+          <h2 className="text-xl md:text-2xl font-bold text-center mb-8 md:mb-10">Frequently Asked Questions</h2>
+          <div className="max-w-3xl mx-auto space-y-5">
             <FAQItem
               question="What payment methods do you accept?"
               answer="We accept credit cards via Stripe and cryptocurrency payments through MetaMask. All transactions are secure and encrypted."
@@ -110,9 +111,14 @@ export function PricingPage() {
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <div className="space-y-2 border-b border-border/40 pb-6 last:border-0">
-      <h3 className="font-semibold text-base md:text-lg">{question}</h3>
-      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{answer}</p>
+    <div className="space-y-3 border-b border-border/40 pb-6 last:border-0">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 text-accent/70 shrink-0">
+          <Question size={20} weight="duotone" />
+        </div>
+        <h3 className="font-semibold text-base md:text-lg">{question}</h3>
+      </div>
+      <p className="text-sm md:text-base text-muted-foreground leading-relaxed pl-8">{answer}</p>
     </div>
   )
 }

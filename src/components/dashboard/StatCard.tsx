@@ -14,25 +14,30 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon, trend, className }: StatCardProps) {
   return (
-    <Card className={cn('border-border/60 hover:border-accent/40 transition-colors', className)}>
-      <CardContent className="p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1 min-w-0">
-            <p className="text-xs sm:text-sm font-medium text-muted-foreground">{label}</p>
-            <p className="text-2xl sm:text-3xl font-bold tracking-tight truncate">{value}</p>
-            {trend && (
-              <p
-                className={cn(
-                  'text-xs font-medium',
-                  trend.positive ? 'text-accent' : 'text-destructive'
-                )}
-              >
-                {trend.value}
-              </p>
-            )}
+    <Card className={cn(
+      'border-border/60 hover:border-accent/40 transition-all duration-200 shadow-sm hover:shadow-md', 
+      className
+    )}>
+      <CardContent className="p-6 sm:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-2 min-w-0 flex-1">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">{label}</p>
+            <div className="flex items-end gap-2">
+              <p className="text-2xl sm:text-3xl font-bold tracking-tight truncate">{value}</p>
+              {trend && (
+                <p
+                  className={cn(
+                    'text-xs font-semibold mb-1',
+                    trend.positive ? 'text-accent' : 'text-destructive'
+                  )}
+                >
+                  {trend.value}
+                </p>
+              )}
+            </div>
           </div>
           {icon && (
-            <div className="text-muted-foreground/40 shrink-0">
+            <div className="text-primary/30 shrink-0">
               {icon}
             </div>
           )}

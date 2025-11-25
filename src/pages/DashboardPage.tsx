@@ -35,11 +35,11 @@ export function DashboardPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-6 md:space-y-8">
+      <div className="space-y-8 md:space-y-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base">
               Manage your NFT tracks and track your earnings
             </p>
           </div>
@@ -51,7 +51,7 @@ export function DashboardPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
           <StatCard
             label="Total Tracks"
             value={tracks.length}
@@ -72,7 +72,7 @@ export function DashboardPage() {
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-4 md:mb-6">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
             <h2 className="text-xl md:text-2xl font-semibold">Your Tracks</h2>
           </div>
 
@@ -97,7 +97,7 @@ export function DashboardPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
               {tracks.map((track) => (
                 <TrackCard key={track.id} track={track} />
               ))}
