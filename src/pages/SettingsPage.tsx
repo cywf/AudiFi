@@ -90,48 +90,48 @@ export function SettingsPage() {
 
   return (
     <MainLayout>
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Settings</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Manage your account, wallet, and subscription
           </p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="profile" className="gap-2">
-              <User size={18} />
-              Profile
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="profile" className="gap-1 sm:gap-2 py-2 sm:py-2.5 text-xs sm:text-sm">
+              <User size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden sm:inline">Profile</span>
             </TabsTrigger>
-            <TabsTrigger value="wallet" className="gap-2">
-              <Wallet size={18} />
-              Wallet
+            <TabsTrigger value="wallet" className="gap-1 sm:gap-2 py-2 sm:py-2.5 text-xs sm:text-sm">
+              <Wallet size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden sm:inline">Wallet</span>
             </TabsTrigger>
-            <TabsTrigger value="billing" className="gap-2">
-              <CreditCard size={18} />
-              Billing
+            <TabsTrigger value="billing" className="gap-1 sm:gap-2 py-2 sm:py-2.5 text-xs sm:text-sm">
+              <CreditCard size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden sm:inline">Billing</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="space-y-4">
-            <Card>
+            <Card className="border-border/60">
               <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-lg sm:text-xl">Profile Information</CardTitle>
+                <CardDescription className="text-sm">
                   Your basic account details
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" value={user.name} disabled />
+                  <Label htmlFor="name" className="text-sm">Name</Label>
+                  <Input id="name" value={user.name} disabled className="h-10" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={user.email} disabled />
+                  <Label htmlFor="email" className="text-sm">Email</Label>
+                  <Input id="email" type="email" value={user.email} disabled className="h-10" />
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Profile editing coming soon. Contact support to update your information.
                 </p>
               </CardContent>
@@ -139,23 +139,23 @@ export function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="wallet" className="space-y-4">
-            <Card>
+            <Card className="border-border/60">
               <CardHeader>
-                <CardTitle>Wallet Connection</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-lg sm:text-xl">Wallet Connection</CardTitle>
+                <CardDescription className="text-sm">
                   Connect your MetaMask wallet to receive payments and manage NFTs
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {user.walletAddress ? (
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                  <div className="flex items-center justify-between p-3 sm:p-4 bg-muted/40 rounded-lg">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
                         <CheckCircle size={24} weight="fill" className="text-accent" />
                       </div>
-                      <div>
-                        <p className="font-medium">Wallet Connected</p>
-                        <p className="text-sm text-muted-foreground font-mono">
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm sm:text-base">Wallet Connected</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground font-mono truncate">
                           {truncateAddress(user.walletAddress)}
                         </p>
                       </div>
@@ -163,13 +163,13 @@ export function SettingsPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       Connect your MetaMask wallet to enable NFT minting and receive cryptocurrency payments.
                     </p>
                     <Button
                       onClick={handleConnectWallet}
                       disabled={connectingWallet}
-                      className="gap-2"
+                      className="gap-2 w-full sm:w-auto"
                     >
                       <Wallet size={18} />
                       {connectingWallet ? 'Connecting...' : 'Connect MetaMask'}
@@ -180,8 +180,8 @@ export function SettingsPage() {
                 <Separator />
 
                 <div className="space-y-2">
-                  <h4 className="font-medium">Important Notes</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <h4 className="font-medium text-sm">Important Notes</h4>
+                  <ul className="text-xs sm:text-sm text-muted-foreground space-y-1 list-disc list-inside">
                     <li>This is a simulated wallet connection for demo purposes</li>
                     <li>In production, this would trigger the actual MetaMask extension</li>
                     <li>Your wallet address is used for receiving payments and NFT ownership</li>
@@ -192,30 +192,30 @@ export function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="billing" className="space-y-4">
-            <Card>
+            <Card className="border-border/60">
               <CardHeader>
-                <CardTitle>Subscription</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-lg sm:text-xl">Subscription</CardTitle>
+                <CardDescription className="text-sm">
                   Manage your subscription plan
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 bg-muted/40 rounded-lg">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <p className="font-semibold text-lg">{plan.name} Plan</p>
-                      <Badge variant={plan.pricePerMonthUSD === 0 ? 'secondary' : 'default'}>
+                      <p className="font-semibold text-base sm:text-lg">{plan.name} Plan</p>
+                      <Badge variant={plan.pricePerMonthUSD === 0 ? 'secondary' : 'default'} className="text-xs">
                         {plan.pricePerMonthUSD === 0 ? 'Free' : 'Pro'}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       {plan.pricePerMonthUSD === 0
                         ? 'No payment required'
                         : `$${plan.pricePerMonthUSD}/month`}
                     </p>
                   </div>
                   {plan.pricePerMonthUSD > 0 && (
-                    <Button variant="outline" onClick={handleOpenBilling}>
+                    <Button variant="outline" size="sm" onClick={handleOpenBilling} className="w-full sm:w-auto">
                       Manage Subscription
                     </Button>
                   )}
@@ -224,25 +224,25 @@ export function SettingsPage() {
                 <Separator />
 
                 <div className="space-y-2">
-                  <h4 className="font-medium">Plan Features</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
+                  <h4 className="font-medium text-sm">Plan Features</h4>
+                  <div className="space-y-1">
                     {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <CheckCircle size={16} weight="fill" className="text-accent mt-0.5 flex-shrink-0" />
-                        {feature}
-                      </li>
+                      <div key={index} className="flex items-start gap-2 py-1">
+                        <CheckCircle size={16} weight="fill" className="text-accent mt-0.5 shrink-0" />
+                        <span className="text-xs sm:text-sm text-muted-foreground">{feature}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
 
                 {plan.pricePerMonthUSD === 0 && (
                   <>
                     <Separator />
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
+                    <div className="space-y-3">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         Upgrade to Pro for unlimited tracks and advanced features.
                       </p>
-                      <Button className="gap-2">
+                      <Button className="gap-2 w-full sm:w-auto">
                         Upgrade to Pro
                       </Button>
                     </div>

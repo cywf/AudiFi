@@ -18,6 +18,7 @@ import { getTrackById, simulatePurchase } from '@/api/tracks'
 import { truncateAddress } from '@/lib/wallet'
 import type { Track, TrackStatus } from '@/types'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 import {
   Dialog,
   DialogContent,
@@ -28,10 +29,10 @@ import {
 } from '@/components/ui/dialog'
 
 const statusConfig: Record<TrackStatus, { label: string; className: string }> = {
-  DRAFT: { label: 'Draft', className: 'bg-muted text-muted-foreground' },
-  MINTED: { label: 'Minted', className: 'bg-secondary/20 text-secondary' },
-  LISTED: { label: 'Listed', className: 'bg-accent/20 text-accent' },
-  SOLD: { label: 'Sold', className: 'bg-warning/20 text-warning' },
+  DRAFT: { label: 'Draft', className: 'bg-muted/80 text-muted-foreground' },
+  MINTED: { label: 'Minted', className: 'bg-secondary/20 text-secondary-foreground' },
+  LISTED: { label: 'Listed', className: 'bg-accent/20 text-accent-foreground' },
+  SOLD: { label: 'Sold', className: 'bg-warning/20 text-warning-foreground' },
 }
 
 export function TrackDetailPage() {
@@ -112,17 +113,18 @@ export function TrackDetailPage() {
 
   return (
     <MainLayout>
-      <div className="max-w-5xl mx-auto space-y-8">
+      <div className="max-w-5xl mx-auto space-y-6 md:space-y-8">
         <Link to="/dashboard">
-          <Button variant="ghost" className="gap-2 -ml-4">
+          <Button variant="ghost" size="sm" className="gap-2 -ml-2 sm:-ml-4">
             <ArrowLeft size={18} />
-            Back to Dashboard
+            <span className="hidden sm:inline">Back to Dashboard</span>
+            <span className="sm:hidden">Back</span>
           </Button>
         </Link>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
           <div className="space-y-4">
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden border-border/60">
               <CardContent className="p-0">
                 <div className="aspect-square relative bg-muted">
                   {track.coverImageUrl ? (
@@ -133,21 +135,21 @@ export function TrackDetailPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <MusicNote size={96} className="text-muted-foreground opacity-30" />
+                      <MusicNote size={96} weight="duotone" className="text-muted-foreground/30" />
                     </div>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-border/60">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="flex-1 h-12 bg-gradient-to-r from-accent/40 via-primary/40 to-accent/40 rounded flex items-center px-2 gap-1">
+                  <div className="flex-1 h-12 bg-gradient-to-r from-accent/30 via-primary/30 to-accent/30 rounded flex items-center px-2 gap-1">
                     {Array.from({ length: 40 }).map((_, i) => (
                       <div
                         key={i}
-                        className="flex-1 bg-accent/60 rounded-sm"
+                        className="flex-1 bg-accent/50 rounded-sm"
                         style={{ height: `${Math.random() * 80 + 20}%` }}
                       />
                     ))}
@@ -160,20 +162,20 @@ export function TrackDetailPage() {
             </Card>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-5 md:space-y-6">
             <div>
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h1 className="text-4xl font-bold mb-2">{track.title}</h1>
-                  <p className="text-muted-foreground">{track.genre}</p>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3 md:mb-4">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-3xl sm:text-4xl font-bold mb-2 break-words">{track.title}</h1>
+                  <p className="text-muted-foreground text-sm sm:text-base">{track.genre}</p>
                 </div>
-                <Badge className={statusInfo.className}>
+                <Badge className={cn('font-medium shrink-0', statusInfo.className)}>
                   {statusInfo.label}
                 </Badge>
               </div>
 
               {track.description && (
-                <p className="text-muted-foreground">{track.description}</p>
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">{track.description}</p>
               )}
             </div>
 
@@ -182,18 +184,18 @@ export function TrackDetailPage() {
             <div className="grid grid-cols-2 gap-4">
               {track.bpm && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">BPM</p>
-                  <p className="font-semibold">{track.bpm}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">BPM</p>
+                  <p className="font-semibold text-sm sm:text-base">{track.bpm}</p>
                 </div>
               )}
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Royalty</p>
-                <p className="font-semibold">{track.royaltyPercent}%</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Royalty</p>
+                <p className="font-semibold text-sm sm:text-base">{track.royaltyPercent}%</p>
               </div>
               {track.releaseDate && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Release Date</p>
-                  <p className="font-semibold">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Release Date</p>
+                  <p className="font-semibold text-sm sm:text-base">
                     {new Date(track.releaseDate).toLocaleDateString()}
                   </p>
                 </div>
@@ -202,10 +204,10 @@ export function TrackDetailPage() {
 
             {track.moodTags && track.moodTags.length > 0 && (
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Mood</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-2">Mood</p>
                 <div className="flex flex-wrap gap-2">
                   {track.moodTags.map((tag) => (
-                    <Badge key={tag} variant="outline">
+                    <Badge key={tag} variant="outline" className="text-xs">
                       {tag}
                     </Badge>
                   ))}
@@ -217,15 +219,16 @@ export function TrackDetailPage() {
 
             {track.ipfsHash && (
               <div>
-                <p className="text-sm text-muted-foreground mb-2">IPFS Hash</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-2">IPFS Hash</p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 text-xs bg-muted px-3 py-2 rounded font-mono truncate">
+                  <code className="flex-1 text-xs bg-muted/50 px-3 py-2 rounded font-mono truncate">
                     {track.ipfsHash}
                   </code>
                   <Button
                     size="icon"
                     variant="ghost"
                     onClick={() => copyToClipboard(track.ipfsHash!, 'IPFS hash')}
+                    className="shrink-0 h-9 w-9"
                   >
                     <Copy size={18} />
                   </Button>
@@ -235,15 +238,16 @@ export function TrackDetailPage() {
 
             {track.ownerWalletAddress && (
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Current Owner</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-2">Current Owner</p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 text-sm bg-muted px-3 py-2 rounded font-mono">
+                  <code className="flex-1 text-xs sm:text-sm bg-muted/50 px-3 py-2 rounded font-mono truncate">
                     {truncateAddress(track.ownerWalletAddress)}
                   </code>
                   <Button
                     size="icon"
                     variant="ghost"
                     onClick={() => copyToClipboard(track.ownerWalletAddress!, 'Wallet address')}
+                    className="shrink-0 h-9 w-9"
                   >
                     <Copy size={18} />
                   </Button>
@@ -253,16 +257,16 @@ export function TrackDetailPage() {
 
             {track.currentPrice && (
               <Card className="bg-accent/10 border-accent/30">
-                <CardContent className="p-6">
+                <CardContent className="p-5 sm:p-6">
                   <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-4xl font-bold text-accent">
+                    <span className="text-3xl sm:text-4xl font-bold text-accent">
                       {track.currentPrice}
                     </span>
-                    <span className="text-xl text-muted-foreground">
+                    <span className="text-lg sm:text-xl text-muted-foreground">
                       {track.currency}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground">Current price</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Current price</p>
                 </CardContent>
               </Card>
             )}
@@ -270,7 +274,7 @@ export function TrackDetailPage() {
             <div className="space-y-2">
               {isArtist ? (
                 <>
-                  <Button className="w-full" variant="secondary" disabled>
+                  <Button className="w-full" variant="secondary" size="lg" disabled>
                     <Eye size={18} className="mr-2" />
                     View on OpenSea
                   </Button>
@@ -280,7 +284,7 @@ export function TrackDetailPage() {
                 </>
               ) : track.status === 'LISTED' ? (
                 <Button
-                  className="w-full gap-2"
+                  className="w-full gap-2 font-semibold"
                   size="lg"
                   onClick={() => setShowPurchaseDialog(true)}
                 >
@@ -288,7 +292,7 @@ export function TrackDetailPage() {
                   Buy Now
                 </Button>
               ) : track.status === 'SOLD' ? (
-                <Button className="w-full" disabled>
+                <Button className="w-full" size="lg" disabled>
                   Sold Out
                 </Button>
               ) : null}
@@ -298,12 +302,12 @@ export function TrackDetailPage() {
       </div>
 
       <Dialog open={showPurchaseDialog} onOpenChange={setShowPurchaseDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">
               {purchaseComplete ? 'Purchase Complete!' : 'Confirm Purchase'}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm">
               {purchaseComplete
                 ? 'You are now the proud owner of this NFT track.'
                 : `You are about to purchase "${track.title}" for ${track.currentPrice} ${track.currency}`}
@@ -315,29 +319,29 @@ export function TrackDetailPage() {
               <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center">
                 <CheckCircle size={40} weight="fill" className="text-accent" />
               </div>
-              <p className="text-center text-muted-foreground">
+              <p className="text-center text-muted-foreground text-sm leading-relaxed">
                 The NFT has been transferred to your wallet and the artist will receive {track.royaltyPercent}% on all future resales.
               </p>
             </div>
           ) : (
             <div className="space-y-4 py-4">
-              <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                <div className="flex justify-between">
+              <div className="bg-muted/40 p-4 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Price</span>
                   <span className="font-semibold">{track.currentPrice} {track.currency}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Artist Royalty</span>
                   <span className="font-semibold">{track.royaltyPercent}%</span>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 This is a simulated purchase. In production, this would trigger a real blockchain transaction.
               </p>
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             {purchaseComplete ? (
               <Button onClick={() => setShowPurchaseDialog(false)} className="w-full">
                 Close
@@ -348,10 +352,11 @@ export function TrackDetailPage() {
                   variant="outline"
                   onClick={() => setShowPurchaseDialog(false)}
                   disabled={purchasing}
+                  className="w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
-                <Button onClick={handlePurchase} disabled={purchasing}>
+                <Button onClick={handlePurchase} disabled={purchasing} className="w-full sm:w-auto">
                   {purchasing ? 'Processing...' : 'Confirm Purchase'}
                 </Button>
               </>

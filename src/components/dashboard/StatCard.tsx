@@ -14,12 +14,12 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon, trend, className }: StatCardProps) {
   return (
-    <Card className={cn('bg-card/50 backdrop-blur-sm', className)}>
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">{label}</p>
-            <p className="text-3xl font-bold tracking-tight">{value}</p>
+    <Card className={cn('border-border/60 hover:border-accent/40 transition-colors', className)}>
+      <CardContent className="p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1 min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground">{label}</p>
+            <p className="text-2xl sm:text-3xl font-bold tracking-tight truncate">{value}</p>
             {trend && (
               <p
                 className={cn(
@@ -32,7 +32,7 @@ export function StatCard({ label, value, icon, trend, className }: StatCardProps
             )}
           </div>
           {icon && (
-            <div className="text-muted-foreground opacity-50">
+            <div className="text-muted-foreground/40 shrink-0">
               {icon}
             </div>
           )}

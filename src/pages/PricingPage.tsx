@@ -54,12 +54,12 @@ export function PricingPage() {
 
   return (
     <MainLayout>
-      <div className="max-w-6xl mx-auto space-y-12">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+      <div className="max-w-6xl mx-auto space-y-10 md:space-y-12">
+        <div className="text-center space-y-3 md:space-y-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
             Simple, transparent pricing
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Start for free, upgrade when you're ready to scale. No hidden fees.
           </p>
         </div>
@@ -69,7 +69,7 @@ export function PricingPage() {
             <LoadingSpinner size="lg" />
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
             {plans.map((plan, index) => (
               <PricingTierCard
                 key={plan.id}
@@ -82,8 +82,8 @@ export function PricingPage() {
           </div>
         )}
 
-        <div className="border-t border-border pt-12">
-          <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+        <div className="border-t border-border/60 pt-10 md:pt-12">
+          <h2 className="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8">Frequently Asked Questions</h2>
           <div className="max-w-3xl mx-auto space-y-6">
             <FAQItem
               question="What payment methods do you accept?"
@@ -110,9 +110,9 @@ export function PricingPage() {
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <div className="space-y-2">
-      <h3 className="font-semibold text-lg">{question}</h3>
-      <p className="text-muted-foreground">{answer}</p>
+    <div className="space-y-2 border-b border-border/40 pb-6 last:border-0">
+      <h3 className="font-semibold text-base md:text-lg">{question}</h3>
+      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{answer}</p>
     </div>
   )
 }

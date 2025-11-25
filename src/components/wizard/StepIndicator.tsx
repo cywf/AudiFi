@@ -21,21 +21,21 @@ export function StepIndicator({ steps, currentStep, className }: StepIndicatorPr
               <div className="flex flex-col items-center gap-2">
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all',
+                    'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm transition-all',
                     isCompleted && 'bg-accent text-accent-foreground',
                     isCurrent && 'bg-primary text-primary-foreground ring-4 ring-primary/20',
                     isUpcoming && 'bg-muted text-muted-foreground'
                   )}
                 >
                   {isCompleted ? (
-                    <CheckCircle size={24} weight="fill" />
+                    <CheckCircle size={20} weight="fill" className="sm:w-6 sm:h-6" />
                   ) : (
                     <span>{index + 1}</span>
                   )}
                 </div>
                 <span
                   className={cn(
-                    'text-xs font-medium text-center hidden sm:block max-w-[100px] truncate',
+                    'text-xs font-medium text-center hidden md:block max-w-[100px] truncate',
                     isCurrent && 'text-foreground',
                     !isCurrent && 'text-muted-foreground'
                   )}
@@ -47,7 +47,7 @@ export function StepIndicator({ steps, currentStep, className }: StepIndicatorPr
               {index < steps.length - 1 && (
                 <div
                   className={cn(
-                    'h-0.5 flex-1 mx-2 transition-colors',
+                    'h-0.5 flex-1 mx-1 sm:mx-2 transition-colors',
                     isCompleted ? 'bg-accent' : 'bg-muted'
                   )}
                 />

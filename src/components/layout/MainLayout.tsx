@@ -17,8 +17,8 @@ export function MainLayout({ children }: MainLayoutProps) {
   ]
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-background flex flex-col">
+      <header className="border-b border-border/50 bg-card/40 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -36,9 +36,10 @@ export function MainLayout({ children }: MainLayoutProps) {
                   <Link key={item.path} to={item.path}>
                     <Button
                       variant={isActive ? 'secondary' : 'ghost'}
+                      size="sm"
                       className={cn(
                         'gap-2',
-                        isActive && 'bg-secondary/20 text-secondary'
+                        isActive && 'bg-secondary/15 text-secondary-foreground'
                       )}
                     >
                       <Icon size={18} />
@@ -49,7 +50,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               })}
             </nav>
 
-            <div className="flex md:hidden items-center gap-2">
+            <div className="flex md:hidden items-center gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive = location.pathname === item.path
@@ -59,7 +60,8 @@ export function MainLayout({ children }: MainLayoutProps) {
                       variant={isActive ? 'secondary' : 'ghost'}
                       size="icon"
                       className={cn(
-                        isActive && 'bg-secondary/20 text-secondary'
+                        'h-9 w-9',
+                        isActive && 'bg-secondary/15 text-secondary-foreground'
                       )}
                     >
                       <Icon size={20} />
@@ -72,11 +74,11 @@ export function MainLayout({ children }: MainLayoutProps) {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {children}
       </main>
 
-      <footer className="border-t border-border mt-20 py-8">
+      <footer className="border-t border-border/60 py-8 mt-auto">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p>© 2024 NFT Tracks. Empowering independent artists.</p>

@@ -140,16 +140,16 @@ export function CreateTrackPage() {
 
   return (
     <MainLayout>
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight">Create NFT Track</h1>
-            <p className="text-muted-foreground mt-2">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Create NFT Track</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
               Mint your music as a one-of-one NFT
             </p>
           </div>
           {currentStep === 0 && (
-            <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="gap-2">
               <X size={18} />
               Cancel
             </Button>
@@ -160,8 +160,8 @@ export function CreateTrackPage() {
           <StepIndicator steps={WIZARD_STEPS} currentStep={currentStep} />
         )}
 
-        <Card>
-          <CardContent className="p-8">
+        <Card className="border-border/60">
+          <CardContent className="p-5 sm:p-6 md:p-8">
             {currentStep === 0 && <Step1TrackDetails formData={formData} updateField={updateField} toggleMoodTag={toggleMoodTag} simulateFileUpload={simulateFileUpload} />}
             {currentStep === 1 && <Step2Artwork formData={formData} updateField={updateField} simulateFileUpload={simulateFileUpload} />}
             {currentStep === 2 && <Step3Economics formData={formData} updateField={updateField} />}
@@ -174,13 +174,13 @@ export function CreateTrackPage() {
                     <Sparkle size={40} weight="fill" className="text-primary" />
                   </div>
                   <div className="text-center">
-                    <h3 className="text-2xl font-bold mb-2">Minting Your NFT</h3>
-                    <p className="text-muted-foreground">
+                    <h3 className="text-xl md:text-2xl font-bold mb-2">Minting Your NFT</h3>
+                    <p className="text-muted-foreground text-sm">
                       Uploading to IPFS and deploying to blockchain...
                     </p>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 max-w-md mx-auto">
                   <Progress value={mintProgress} className="h-2" />
                   <p className="text-center text-sm text-muted-foreground">
                     {mintProgress}% complete
@@ -196,27 +196,27 @@ export function CreateTrackPage() {
                     <CheckCircle size={48} weight="fill" className="text-accent" />
                   </div>
                   <div className="text-center">
-                    <h3 className="text-2xl font-bold mb-2">Mint Successful!</h3>
-                    <p className="text-muted-foreground mb-4">
+                    <h3 className="text-xl md:text-2xl font-bold mb-2">Mint Successful!</h3>
+                    <p className="text-muted-foreground mb-4 text-sm">
                       Your track has been minted as an NFT
                     </p>
                     <div className="bg-muted/50 rounded-lg p-4 space-y-2 max-w-md">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Token ID</span>
-                        <span className="font-mono">{mintedTrackId}</span>
+                        <span className="font-mono text-xs sm:text-sm">{mintedTrackId}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Status</span>
-                        <Badge className="bg-secondary/20 text-secondary">Minted</Badge>
+                        <Badge className="bg-secondary/20 text-secondary-foreground">Minted</Badge>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-4 justify-center">
-                  <Button onClick={() => navigate(`/tracks/${mintedTrackId}`)} size="lg">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button onClick={() => navigate(`/tracks/${mintedTrackId}`)} size="lg" className="w-full sm:w-auto">
                     View Track
                   </Button>
-                  <Button onClick={() => navigate('/dashboard')} variant="secondary" size="lg">
+                  <Button onClick={() => navigate('/dashboard')} variant="secondary" size="lg" className="w-full sm:w-auto">
                     Go to Dashboard
                   </Button>
                 </div>
@@ -232,14 +232,16 @@ export function CreateTrackPage() {
               onClick={handleBack}
               disabled={currentStep === 0}
               className="gap-2"
+              size="sm"
             >
               <ArrowLeft size={18} />
-              Back
+              <span className="hidden sm:inline">Back</span>
             </Button>
 
             {currentStep < WIZARD_STEPS.length - 1 ? (
-              <Button onClick={handleNext} disabled={!canProceed()} className="gap-2">
-                Next
+              <Button onClick={handleNext} disabled={!canProceed()} className="gap-2" size="sm">
+                <span className="hidden sm:inline">Next</span>
+                <span className="sm:hidden">Next</span>
                 <ArrowRight size={18} />
               </Button>
             ) : (
@@ -267,27 +269,28 @@ function Step1TrackDetails({
   simulateFileUpload: (type: 'audio' | 'image') => void
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 md:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Track Details</h2>
-        <p className="text-muted-foreground">Basic information about your track</p>
+        <h2 className="text-xl md:text-2xl font-bold mb-1">Track Details</h2>
+        <p className="text-muted-foreground text-sm">Basic information about your track</p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="title">Track Title *</Label>
+          <Label htmlFor="title" className="text-sm font-medium">Track Title *</Label>
           <Input
             id="title"
             placeholder="Enter track title"
             value={formData.title}
             onChange={(e) => updateField('title', e.target.value)}
+            className="h-10"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="genre">Genre *</Label>
+          <Label htmlFor="genre" className="text-sm font-medium">Genre *</Label>
           <Select value={formData.genre} onValueChange={(value) => updateField('genre', value)}>
-            <SelectTrigger id="genre">
+            <SelectTrigger id="genre" className="h-10">
               <SelectValue placeholder="Select genre" />
             </SelectTrigger>
             <SelectContent>
@@ -301,25 +304,26 @@ function Step1TrackDetails({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="bpm">BPM (optional)</Label>
+          <Label htmlFor="bpm" className="text-sm font-medium">BPM (optional)</Label>
           <Input
             id="bpm"
             type="number"
             placeholder="120"
             value={formData.bpm || ''}
             onChange={(e) => updateField('bpm', e.target.value ? parseInt(e.target.value) : undefined)}
+            className="h-10"
           />
         </div>
 
         <div className="space-y-2">
-          <Label>Mood Tags (select up to 5)</Label>
+          <Label className="text-sm font-medium">Mood Tags (select up to 5)</Label>
           <div className="flex flex-wrap gap-2">
             {MOOD_TAGS.map((tag) => (
               <Badge
                 key={tag}
                 variant={formData.moodTags?.includes(tag) ? 'default' : 'outline'}
                 className={cn(
-                  'cursor-pointer transition-all',
+                  'cursor-pointer transition-all text-xs',
                   formData.moodTags?.includes(tag) && 'bg-accent text-accent-foreground'
                 )}
                 onClick={() => {
@@ -335,27 +339,28 @@ function Step1TrackDetails({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description" className="text-sm font-medium">Description</Label>
           <Textarea
             id="description"
             placeholder="Describe your track..."
             value={formData.description}
             onChange={(e) => updateField('description', e.target.value)}
             rows={4}
+            className="resize-none"
           />
         </div>
 
         <div className="space-y-2">
-          <Label>Audio File *</Label>
-          <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-accent/50 transition-colors">
+          <Label className="text-sm font-medium">Audio File *</Label>
+          <div className="border-2 border-dashed border-border rounded-lg p-4 sm:p-6 text-center hover:border-accent/50 transition-colors">
             {formData.audioFileName ? (
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center shrink-0">
                     <CheckCircle size={24} weight="fill" className="text-accent" />
                   </div>
-                  <div className="text-left">
-                    <p className="font-medium text-sm">{formData.audioFileName}</p>
+                  <div className="text-left min-w-0">
+                    <p className="font-medium text-sm truncate">{formData.audioFileName}</p>
                     <p className="text-xs text-muted-foreground">Audio file ready</p>
                   </div>
                 </div>
@@ -363,17 +368,19 @@ function Step1TrackDetails({
                   variant="ghost"
                   size="sm"
                   onClick={() => updateField('audioFileName', '')}
+                  className="shrink-0"
                 >
                   Remove
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <UploadSimple size={32} className="mx-auto text-muted-foreground" />
                 <div>
                   <Button
                     variant="secondary"
                     onClick={() => simulateFileUpload('audio')}
+                    size="sm"
                   >
                     Upload Audio
                   </Button>
@@ -400,36 +407,38 @@ function Step2Artwork({
   simulateFileUpload: (type: 'audio' | 'image') => void
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 md:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Artwork</h2>
-        <p className="text-muted-foreground">Add a cover image for your NFT</p>
+        <h2 className="text-xl md:text-2xl font-bold mb-1">Artwork</h2>
+        <p className="text-muted-foreground text-sm">Add a cover image for your NFT</p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label>Cover Artwork (optional)</Label>
-          <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-accent/50 transition-colors">
+          <Label className="text-sm font-medium">Cover Artwork (optional)</Label>
+          <div className="border-2 border-dashed border-border rounded-lg p-4 sm:p-6 text-center hover:border-accent/50 transition-colors">
             {formData.coverImageUrl ? (
               <div className="space-y-4">
                 <img
                   src={formData.coverImageUrl}
                   alt="Cover"
-                  className="w-full max-w-md mx-auto rounded-lg"
+                  className="w-full max-w-sm mx-auto rounded-lg"
                 />
                 <Button
                   variant="secondary"
+                  size="sm"
                   onClick={() => updateField('coverImageUrl', '')}
                 >
                   Remove Image
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <UploadSimple size={32} className="mx-auto text-muted-foreground" />
                 <div>
                   <Button
                     variant="secondary"
+                    size="sm"
                     onClick={() => simulateFileUpload('image')}
                   >
                     Upload Image
@@ -443,7 +452,7 @@ function Step2Artwork({
           </div>
         </div>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           High-quality artwork helps your track stand out. Consider including your artist name or logo.
         </p>
       </div>
@@ -459,25 +468,26 @@ function Step3Economics({
   updateField: <K extends keyof CreateTrackPayload>(field: K, value: CreateTrackPayload[K]) => void
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 md:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Economics & Release</h2>
-        <p className="text-muted-foreground">Set pricing and royalty terms</p>
+        <h2 className="text-xl md:text-2xl font-bold mb-1">Economics & Release</h2>
+        <p className="text-muted-foreground text-sm">Set pricing and royalty terms</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-5 md:space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="releaseDate">Release Date (optional)</Label>
+          <Label htmlFor="releaseDate" className="text-sm font-medium">Release Date (optional)</Label>
           <Input
             id="releaseDate"
             type="date"
             value={formData.releaseDate}
             onChange={(e) => updateField('releaseDate', e.target.value)}
+            className="h-10"
           />
         </div>
 
-        <div className="space-y-4">
-          <Label htmlFor="price">Initial Price (optional)</Label>
+        <div className="space-y-2">
+          <Label htmlFor="price" className="text-sm font-medium">Initial Price (optional)</Label>
           <div className="flex gap-2">
             <Input
               id="price"
@@ -486,10 +496,10 @@ function Step3Economics({
               placeholder="0.5"
               value={formData.currentPrice || ''}
               onChange={(e) => updateField('currentPrice', e.target.value ? parseFloat(e.target.value) : undefined)}
-              className="flex-1"
+              className="flex-1 h-10"
             />
             <Select value={formData.currency} onValueChange={(value: 'ETH' | 'USD') => updateField('currency', value)}>
-              <SelectTrigger className="w-24">
+              <SelectTrigger className="w-20 h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -502,8 +512,8 @@ function Step3Economics({
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="royalty">Royalty Percentage</Label>
-            <span className="text-2xl font-bold text-accent">{formData.royaltyPercent}%</span>
+            <Label htmlFor="royalty" className="text-sm font-medium">Royalty Percentage</Label>
+            <span className="text-xl sm:text-2xl font-bold text-accent">{formData.royaltyPercent}%</span>
           </div>
           <Slider
             id="royalty"
@@ -514,15 +524,15 @@ function Step3Economics({
             onValueChange={(value) => updateField('royaltyPercent', value[0])}
             className="py-4"
           />
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             You'll receive this percentage on every resale of your NFT, forever.
           </p>
         </div>
 
-        <div className="flex items-center justify-between space-x-2 rounded-lg border border-border p-4">
-          <div className="space-y-0.5">
-            <Label htmlFor="resale">Allow Secondary Market Resale</Label>
-            <p className="text-sm text-muted-foreground">
+        <div className="flex items-center justify-between space-x-3 rounded-lg border border-border/60 p-4">
+          <div className="space-y-0.5 flex-1 min-w-0">
+            <Label htmlFor="resale" className="text-sm font-medium">Allow Secondary Market Resale</Label>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Let buyers resell on OpenSea and other marketplaces
             </p>
           </div>
@@ -539,38 +549,38 @@ function Step3Economics({
 
 function Step4Review({ formData }: { formData: Partial<CreateTrackPayload> }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 md:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Review & Confirm</h2>
-        <p className="text-muted-foreground">Double-check everything before minting</p>
+        <h2 className="text-xl md:text-2xl font-bold mb-1">Review & Confirm</h2>
+        <p className="text-muted-foreground text-sm">Double-check everything before minting</p>
       </div>
 
       <div className="space-y-4">
-        <div className="bg-muted/50 rounded-lg p-6 space-y-4">
+        <div className="bg-muted/40 rounded-lg p-4 sm:p-6 space-y-4">
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Title</p>
-            <p className="font-semibold text-lg">{formData.title}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Title</p>
+            <p className="font-semibold text-base sm:text-lg">{formData.title}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Genre</p>
-              <p className="font-medium">{formData.genre}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Genre</p>
+              <p className="font-medium text-sm sm:text-base">{formData.genre}</p>
             </div>
             {formData.bpm && (
               <div>
-                <p className="text-sm text-muted-foreground mb-1">BPM</p>
-                <p className="font-medium">{formData.bpm}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">BPM</p>
+                <p className="font-medium text-sm sm:text-base">{formData.bpm}</p>
               </div>
             )}
           </div>
 
           {formData.moodTags && formData.moodTags.length > 0 && (
             <div>
-              <p className="text-sm text-muted-foreground mb-2">Mood Tags</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-2">Mood Tags</p>
               <div className="flex flex-wrap gap-2">
                 {formData.moodTags.map((tag) => (
-                  <Badge key={tag} variant="secondary">{tag}</Badge>
+                  <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
                 ))}
               </div>
             </div>
@@ -578,40 +588,40 @@ function Step4Review({ formData }: { formData: Partial<CreateTrackPayload> }) {
 
           {formData.description && (
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Description</p>
-              <p className="text-sm">{formData.description}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Description</p>
+              <p className="text-sm leading-relaxed">{formData.description}</p>
             </div>
           )}
 
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Audio File</p>
-            <p className="font-mono text-sm">{formData.audioFileName}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Audio File</p>
+            <p className="font-mono text-xs sm:text-sm truncate">{formData.audioFileName}</p>
           </div>
 
           {formData.currentPrice && (
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Initial Price</p>
-              <p className="text-2xl font-bold text-accent">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Initial Price</p>
+              <p className="text-xl sm:text-2xl font-bold text-accent">
                 {formData.currentPrice} {formData.currency}
               </p>
             </div>
           )}
 
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Royalty Percentage</p>
-            <p className="font-semibold">{formData.royaltyPercent}%</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Royalty Percentage</p>
+            <p className="font-semibold text-sm sm:text-base">{formData.royaltyPercent}%</p>
           </div>
 
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Secondary Resale</p>
-            <p className="font-medium">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Secondary Resale</p>
+            <p className="font-medium text-sm">
               {formData.allowSecondaryResale ? 'Allowed' : 'Not allowed'}
             </p>
           </div>
         </div>
 
-        <div className="bg-accent/10 border border-accent/30 rounded-lg p-4">
-          <p className="text-sm">
+        <div className="bg-accent/10 border border-accent/30 rounded-lg p-3 sm:p-4">
+          <p className="text-xs sm:text-sm leading-relaxed">
             <strong>Note:</strong> Once minted, this NFT cannot be modified. Ensure all details are correct before proceeding.
           </p>
         </div>
