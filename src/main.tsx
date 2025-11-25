@@ -7,6 +7,8 @@ import { ErrorFallback } from './ErrorFallback.tsx'
 
 import "./main.css"
 
+document.documentElement.classList.add('dark')
+
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary FallbackComponent={ErrorFallback}>
     <App />
