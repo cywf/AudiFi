@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 import { CheckCircle } from '@phosphor-icons/react'
 
 interface StepIndicatorProps {
-  steps: string[]
+  steps: readonly string[]
   currentStep: number
   className?: string
 }
@@ -17,7 +17,7 @@ export function StepIndicator({ steps, currentStep, className }: StepIndicatorPr
           const isUpcoming = index > currentStep
 
           return (
-            <div key={step} className="flex items-center flex-1 last:flex-none">
+            <div key={`step-${index}-${step}`} className="flex items-center flex-1 last:flex-none">
               <div className="flex flex-col items-center gap-2">
                 <div
                   className={cn(
@@ -35,7 +35,7 @@ export function StepIndicator({ steps, currentStep, className }: StepIndicatorPr
                 </div>
                 <span
                   className={cn(
-                    'text-xs font-medium text-center hidden sm:block',
+                    'text-xs font-medium text-center hidden sm:block max-w-[100px] truncate',
                     isCurrent && 'text-foreground',
                     !isCurrent && 'text-muted-foreground'
                   )}

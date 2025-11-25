@@ -17,38 +17,7 @@ import { createTrackDraft, simulateMint } from '@/api/tracks'
 import type { CreateTrackPayload } from '@/types'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-
-const STEPS = ['Track Details', 'Artwork', 'Economics', 'Review & Mint']
-
-const GENRES = [
-  'Electronic',
-  'Hip Hop',
-  'R&B',
-  'Pop',
-  'Rock',
-  'Jazz',
-  'Classical',
-  'Deep House',
-  'Techno',
-  'Ambient',
-  'Synthwave',
-  'Experimental',
-]
-
-const MOOD_TAGS = [
-  'Energetic',
-  'Dark',
-  'Uplifting',
-  'Melancholic',
-  'Hypnotic',
-  'Cinematic',
-  'Groovy',
-  'Atmospheric',
-  'Aggressive',
-  'Chill',
-  'Nostalgic',
-  'Abstract',
-]
+import { GENRES, MOOD_TAGS, WIZARD_STEPS, APP_CONFIG } from '@/constants'
 
 export function CreateTrackPage() {
   const navigate = useNavigate()
@@ -66,7 +35,7 @@ export function CreateTrackPage() {
     moodTags: [],
     audioFileName: '',
     coverImageUrl: '',
-    royaltyPercent: 10,
+    royaltyPercent: APP_CONFIG.defaultRoyaltyPercent,
     currentPrice: undefined,
     currency: 'ETH',
     allowSecondaryResale: true,
@@ -104,7 +73,7 @@ export function CreateTrackPage() {
   }
 
   const handleNext = () => {
-    if (currentStep < STEPS.length - 1) {
+    if (currentStep < WIZARD_STEPS.length - 1) {
       setCurrentStep(currentStep + 1)
     }
   }
@@ -188,7 +157,7 @@ export function CreateTrackPage() {
         </div>
 
         {!mintComplete && (
-          <StepIndicator steps={STEPS} currentStep={currentStep} />
+          <StepIndicator steps={WIZARD_STEPS} currentStep={currentStep} />
         )}
 
         <Card>
@@ -268,7 +237,7 @@ export function CreateTrackPage() {
               Back
             </Button>
 
-            {currentStep < STEPS.length - 1 ? (
+            {currentStep < WIZARD_STEPS.length - 1 ? (
               <Button onClick={handleNext} disabled={!canProceed()} className="gap-2">
                 Next
                 <ArrowRight size={18} />
@@ -354,7 +323,7 @@ function Step1TrackDetails({
                   formData.moodTags?.includes(tag) && 'bg-accent text-accent-foreground'
                 )}
                 onClick={() => {
-                  if (formData.moodTags?.includes(tag) || (formData.moodTags?.length || 0) < 5) {
+                  if (formData.moodTags?.includes(tag) || (formData.moodTags?.length || 0) < APP_CONFIG.maxMoodTags) {
                     toggleMoodTag(tag)
                   }
                 }}
@@ -541,7 +510,7 @@ function Step3Economics({
             min={0}
             max={25}
             step={1}
-            value={[formData.royaltyPercent || 10]}
+            value={[formData.royaltyPercent || APP_CONFIG.defaultRoyaltyPercent]}
             onValueChange={(value) => updateField('royaltyPercent', value[0])}
             className="py-4"
           />

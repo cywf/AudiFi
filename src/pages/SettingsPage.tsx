@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { MainLayout } from '@/components/layout/MainLayout'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,6 +33,7 @@ export function SettingsPage() {
         setPlan(planData)
       } catch (error) {
         console.error('Failed to load settings:', error)
+        toast.error('Failed to load settings')
       } finally {
         setLoading(false)
       }
@@ -66,12 +68,21 @@ export function SettingsPage() {
     }
   }
 
-  if (loading || !user || !plan) {
+  if (loading) {
     return (
       <MainLayout>
-        <div className="animate-pulse space-y-4">
-          <div className="h-12 bg-card rounded" />
-          <div className="h-96 bg-card rounded" />
+        <div className="flex items-center justify-center py-20">
+          <LoadingSpinner size="lg" />
+        </div>
+      </MainLayout>
+    )
+  }
+
+  if (!user || !plan) {
+    return (
+      <MainLayout>
+        <div className="text-center py-20">
+          <p className="text-muted-foreground">Failed to load settings. Please try again.</p>
         </div>
       </MainLayout>
     )

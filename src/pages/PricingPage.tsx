@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { PricingTierCard } from '@/components/pricing/PricingTierCard'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { getPlans, getCurrentUserPlan } from '@/api/subscription'
 import { startSubscriptionCheckout } from '@/lib/payments'
 import type { SubscriptionPlan } from '@/types'
@@ -24,6 +25,7 @@ export function PricingPage() {
         setCurrentPlan(userPlan)
       } catch (error) {
         console.error('Failed to load pricing data:', error)
+        toast.error('Failed to load pricing information')
       } finally {
         setLoading(false)
       }
@@ -63,10 +65,8 @@ export function PricingPage() {
         </div>
 
         {loading ? (
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {[1, 2].map((i) => (
-              <div key={i} className="h-[500px] bg-card rounded-lg animate-pulse" />
-            ))}
+          <div className="flex items-center justify-center py-20">
+            <LoadingSpinner size="lg" />
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">

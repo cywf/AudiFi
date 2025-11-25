@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { MainLayout } from '@/components/layout/MainLayout'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -49,6 +50,7 @@ export function TrackDetailPage() {
         setTrack(data)
       } catch (error) {
         console.error('Failed to load track:', error)
+        toast.error('Failed to load track')
       } finally {
         setLoading(false)
       }
@@ -82,9 +84,8 @@ export function TrackDetailPage() {
   if (loading) {
     return (
       <MainLayout>
-        <div className="animate-pulse space-y-4">
-          <div className="h-12 bg-card rounded" />
-          <div className="h-96 bg-card rounded" />
+        <div className="flex items-center justify-center py-20">
+          <LoadingSpinner size="lg" />
         </div>
       </MainLayout>
     )

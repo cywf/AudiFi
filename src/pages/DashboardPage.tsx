@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { TrackCard } from '@/components/tracks/TrackCard'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Button } from '@/components/ui/button'
 import { Plus, MusicNote, CurrencyEth, TrendUp } from '@phosphor-icons/react'
 import { getTracksForCurrentUser } from '@/api/tracks'
@@ -44,7 +45,7 @@ export function DashboardPage() {
           </div>
           <Link to="/tracks/new">
             <Button size="lg" className="gap-2">
-              <Plus size={20} />
+              <Plus size={20} weight="bold" />
               Create New NFT Track
             </Button>
           </Link>
@@ -76,10 +77,8 @@ export function DashboardPage() {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="aspect-square bg-card rounded-lg animate-pulse" />
-              ))}
+            <div className="flex items-center justify-center py-20">
+              <LoadingSpinner size="lg" />
             </div>
           ) : tracks.length === 0 ? (
             <div className="text-center py-20">
@@ -92,7 +91,7 @@ export function DashboardPage() {
               </p>
               <Link to="/tracks/new">
                 <Button size="lg" className="gap-2">
-                  <Plus size={20} />
+                  <Plus size={20} weight="bold" />
                   Create Your First Track
                 </Button>
               </Link>
