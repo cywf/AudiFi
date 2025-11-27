@@ -31,7 +31,8 @@ export interface Track {
   ipfsHash?: string
   ownerWalletAddress?: string
   currentPrice?: number
-  currency?: "ETH" | "USD"
+  currency?: "ETH" | "SOL" | "USD"
+  blockchain?: "ethereum" | "solana"
   royaltyPercent: number
   releaseDate?: string
   allowSecondaryResale?: boolean
@@ -45,9 +46,10 @@ export interface SaleEvent {
   fromWallet: string
   toWallet: string
   price: number
-  currency: "ETH" | "USD"
+  currency: "ETH" | "SOL" | "USD"
+  blockchain: "ethereum" | "solana"
   timestamp: string
-  marketplace: "NFT_TRACKS" | "OPENSEA" | "OTHER"
+  marketplace: "NFT_TRACKS" | "OPENSEA" | "MAGIC_EDEN" | "OTHER"
 }
 
 export interface CreateTrackPayload {
@@ -62,7 +64,8 @@ export interface CreateTrackPayload {
   releaseDate?: string
   allowSecondaryResale?: boolean
   currentPrice?: number
-  currency?: "ETH" | "USD"
+  currency?: "ETH" | "SOL" | "USD"
+  blockchain?: "ethereum" | "solana"
 }
 
 export interface UserProfile {

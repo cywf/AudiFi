@@ -22,7 +22,7 @@ import {
   CurrencyEth
 } from '@phosphor-icons/react'
 import type { Track } from '@/types'
-import { purchaseTrack, simulateMetaMaskConnection } from '@/api/marketplace'
+import { purchaseTrack, simulateMetaMaskConnection, simulatePhantomConnection } from '@/api/marketplace'
 import { toast } from 'sonner'
 
 interface PurchaseModalProps {
@@ -33,9 +33,10 @@ interface PurchaseModalProps {
 }
 
 type PurchaseStep = 'payment-method' | 'connecting-wallet' | 'processing' | 'success' | 'error'
+type PaymentMethod = 'metamask' | 'phantom' | 'stripe'
 
 export function PurchaseModal({ track, open, onOpenChange, onPurchaseComplete }: PurchaseModalProps) {
-  const [paymentMethod, setPaymentMethod] = useState<'metamask' | 'stripe'>('metamask')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('metamask')
   const [step, setStep] = useState<PurchaseStep>('payment-method')
   const [walletAddress, setWalletAddress] = useState<string>('')
   const [transactionHash, setTransactionHash] = useState<string>('')
@@ -43,15 +44,44 @@ export function PurchaseModal({ track, open, onOpenChange, onPurchaseComplete }:
 
   if (!track) return null
 
+  const isSolana = track.blockchain === 'solana'
+  const isEthereum = track.blockchain === 'ethereum'
+
   const handlePurchase = async () => {
     try {
       if (paymentMethod === 'metamask') {
+        if (isSolana) {
+          setError('This is a Solana NFT. Please use Phantom wallet.')
+          setStep('error')
+          return
+        }
+        
         setStep('connecting-wallet')
         const wallet = await simulateMetaMaskConnection()
         setWalletAddress(wallet)
         
         setStep('processing')
-        const result = await purchaseTrack(track.id, wallet, 'metamask')
+        const result = await purchaseTrack(track.id, wallet, 'metamask', 'ethereum')
+        
+        if (result.success && result.transactionHash) {
+          setTransactionHash(result.transactionHash)
+          setStep('success')
+          toast.success('NFT purchased successfully!')
+          onPurchaseComplete()
+        }
+      } else if (paymentMethod === 'phantom') {
+        if (isEthereum) {
+          setError('This is an Ethereum NFT. Please use MetaMask wallet.')
+          setStep('error')
+          return
+        }
+        
+        setStep('connecting-wallet')
+        const wallet = await simulatePhantomConnection()
+        setWalletAddress(wallet)
+        
+        setStep('processing')
+        const result = await purchaseTrack(track.id, wallet, 'phantom', 'solana')
         
         if (result.success && result.transactionHash) {
           setTransactionHash(result.transactionHash)
@@ -61,8 +91,10 @@ export function PurchaseModal({ track, open, onOpenChange, onPurchaseComplete }:
         }
       } else {
         setStep('processing')
-        const mockWallet = `0x${Math.random().toString(16).substring(2, 42)}`
-        await purchaseTrack(track.id, mockWallet, 'stripe')
+        const mockWallet = isSolana 
+          ? 'DYw8jCTfwHNRJhhmFcbXvVDTqWMEVFBX6ZKUmG5CNSKK'
+          : `0x${Math.random().toString(16).substring(2, 42)}`
+        await purchaseTrack(track.id, mockWallet, 'stripe', track.blockchain)
         setStep('success')
         toast.success('NFT purchased successfully!')
         onPurchaseComplete()
@@ -78,11 +110,24 @@ export function PurchaseModal({ track, open, onOpenChange, onPurchaseComplete }:
     onOpenChange(false)
     setTimeout(() => {
       setStep('payment-method')
-      setPaymentMethod('metamask')
+      setPaymentMethod(track?.blockchain === 'solana' ? 'phantom' : 'metamask')
       setWalletAddress('')
       setTransactionHash('')
       setError('')
     }, 300)
+  }
+
+  const getCurrencyIcon = () => {
+    if (track.currency === 'SOL') {
+      return (
+        <svg width="20" height="20" viewBox="0 0 397.7 311.7" fill="currentColor">
+          <path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/>
+          <path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z"/>
+          <path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z"/>
+        </svg>
+      )
+    }
+    return <CurrencyEth size={20} weight="fill" />
   }
 
   const renderContent = () => {
@@ -113,12 +158,17 @@ export function PurchaseModal({ track, open, onOpenChange, onPurchaseComplete }:
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-lg mb-1">{track.title}</h3>
                   <p className="text-sm text-muted-foreground mb-2">{track.genre}</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-accent flex items-center gap-1">
-                      <CurrencyEth size={20} weight="fill" />
-                      {track.currentPrice}
-                    </span>
-                    <span className="text-sm text-muted-foreground">{track.currency}</span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      {track.blockchain === 'solana' ? 'Solana' : 'Ethereum'}
+                    </Badge>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold text-accent flex items-center gap-1">
+                        {getCurrencyIcon()}
+                        {track.currentPrice}
+                      </span>
+                      <span className="text-sm text-muted-foreground">{track.currency}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -127,24 +177,45 @@ export function PurchaseModal({ track, open, onOpenChange, onPurchaseComplete }:
                 <Label className="text-base font-semibold mb-4 block">
                   Select Payment Method
                 </Label>
-                <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as 'metamask' | 'stripe')}>
+                <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
                   <div className="space-y-3">
-                    <Label
-                      htmlFor="metamask"
-                      className="flex items-start gap-3 p-4 border-2 border-border rounded-lg cursor-pointer transition-all hover:border-accent/50 has-[:checked]:border-accent has-[:checked]:bg-accent/5"
-                    >
-                      <RadioGroupItem value="metamask" id="metamask" className="mt-1" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Wallet size={20} className="text-primary" />
-                          <span className="font-semibold">MetaMask / Web3 Wallet</span>
-                          <Badge variant="secondary" className="ml-auto">Recommended</Badge>
+                    {isEthereum && (
+                      <Label
+                        htmlFor="metamask"
+                        className="flex items-start gap-3 p-4 border-2 border-border rounded-lg cursor-pointer transition-all hover:border-accent/50 has-[:checked]:border-accent has-[:checked]:bg-accent/5"
+                      >
+                        <RadioGroupItem value="metamask" id="metamask" className="mt-1" />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Wallet size={20} className="text-primary" />
+                            <span className="font-semibold">MetaMask Wallet</span>
+                            <Badge variant="secondary" className="ml-auto">Ethereum</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Connect your Ethereum wallet to purchase with ETH
+                          </p>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          Connect your crypto wallet to purchase with ETH
-                        </p>
-                      </div>
-                    </Label>
+                      </Label>
+                    )}
+
+                    {isSolana && (
+                      <Label
+                        htmlFor="phantom"
+                        className="flex items-start gap-3 p-4 border-2 border-border rounded-lg cursor-pointer transition-all hover:border-accent/50 has-[:checked]:border-accent has-[:checked]:bg-accent/5"
+                      >
+                        <RadioGroupItem value="phantom" id="phantom" className="mt-1" />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Wallet size={20} className="text-primary" />
+                            <span className="font-semibold">Phantom Wallet</span>
+                            <Badge variant="secondary" className="ml-auto">Solana</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Connect your Solana wallet to purchase with SOL
+                          </p>
+                        </div>
+                      </Label>
+                    )}
 
                     <Label
                       htmlFor="stripe"
@@ -190,7 +261,12 @@ export function PurchaseModal({ track, open, onOpenChange, onPurchaseComplete }:
                 {paymentMethod === 'metamask' ? (
                   <>
                     <Wallet size={18} />
-                    Connect & Purchase
+                    Connect MetaMask
+                  </>
+                ) : paymentMethod === 'phantom' ? (
+                  <>
+                    <Wallet size={18} />
+                    Connect Phantom
                   </>
                 ) : (
                   <>

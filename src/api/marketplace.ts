@@ -16,6 +16,7 @@ const mockMarketplaceTracks: Track[] = [
     ownerWalletAddress: '0x1234567890abcdef1234567890abcdef12345678',
     currentPrice: 0.5,
     currency: 'ETH',
+    blockchain: 'ethereum',
     royaltyPercent: 10,
     releaseDate: new Date('2024-11-01').toISOString(),
     allowSecondaryResale: true,
@@ -34,9 +35,10 @@ const mockMarketplaceTracks: Track[] = [
     artistId: 'artist_002',
     status: 'LISTED',
     ipfsHash: 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdH',
-    ownerWalletAddress: '0xabcdef1234567890abcdef1234567890abcdef12',
-    currentPrice: 0.75,
-    currency: 'ETH',
+    ownerWalletAddress: 'DYw8jCTfwHNRJhhmFcbXvVDTqWMEVFBX6ZKUmG5CNSKK',
+    currentPrice: 12.5,
+    currency: 'SOL',
+    blockchain: 'solana',
     royaltyPercent: 15,
     releaseDate: new Date('2024-12-05').toISOString(),
     allowSecondaryResale: true,
@@ -58,6 +60,7 @@ const mockMarketplaceTracks: Track[] = [
     ownerWalletAddress: '0x7890abcdef1234567890abcdef1234567890abcd',
     currentPrice: 0.25,
     currency: 'ETH',
+    blockchain: 'ethereum',
     royaltyPercent: 10,
     releaseDate: new Date('2024-12-10').toISOString(),
     allowSecondaryResale: true,
@@ -76,9 +79,10 @@ const mockMarketplaceTracks: Track[] = [
     artistId: 'artist_004',
     status: 'LISTED',
     ipfsHash: 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdJ',
-    ownerWalletAddress: '0x4567890abcdef1234567890abcdef1234567890a',
-    currentPrice: 1.2,
-    currency: 'ETH',
+    ownerWalletAddress: 'HN7cABqLq46Es1jh92dQQisAq662SmxELLLsHHe4YWrH',
+    currentPrice: 18.0,
+    currency: 'SOL',
+    blockchain: 'solana',
     royaltyPercent: 12,
     releaseDate: new Date('2024-12-15').toISOString(),
     allowSecondaryResale: true,
@@ -100,6 +104,7 @@ const mockMarketplaceTracks: Track[] = [
     ownerWalletAddress: '0xbcdef1234567890abcdef1234567890abcdef123',
     currentPrice: 0.4,
     currency: 'ETH',
+    blockchain: 'ethereum',
     royaltyPercent: 10,
     releaseDate: new Date('2024-12-18').toISOString(),
     allowSecondaryResale: true,
@@ -118,9 +123,10 @@ const mockMarketplaceTracks: Track[] = [
     artistId: 'artist_006',
     status: 'LISTED',
     ipfsHash: 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdL',
-    ownerWalletAddress: '0xef1234567890abcdef1234567890abcdef123456',
-    currentPrice: 0.65,
-    currency: 'ETH',
+    ownerWalletAddress: 'CuieVDEDtLo7FypA9SbLM9saXFdb1dsshEkyErMqkRQq',
+    currentPrice: 9.75,
+    currency: 'SOL',
+    blockchain: 'solana',
     royaltyPercent: 10,
     releaseDate: new Date('2024-12-20').toISOString(),
     allowSecondaryResale: true,
@@ -145,6 +151,7 @@ function saveMarketplaceTracks(tracks: Track[]): void {
 export interface MarketplaceFilters {
   search?: string
   genre?: string
+  blockchain?: 'ethereum' | 'solana'
   minPrice?: number
   maxPrice?: number
   sortBy?: 'price-asc' | 'price-desc' | 'newest' | 'oldest'
@@ -167,6 +174,10 @@ export async function getMarketplaceListings(filters?: MarketplaceFilters): Prom
 
       if (filters?.genre && filters.genre !== 'all') {
         tracks = tracks.filter(t => t.genre === filters.genre)
+      }
+
+      if (filters?.blockchain) {
+        tracks = tracks.filter(t => t.blockchain === filters.blockchain)
       }
 
       if (filters?.minPrice !== undefined) {
@@ -202,7 +213,8 @@ export async function getMarketplaceListings(filters?: MarketplaceFilters): Prom
 export async function purchaseTrack(
   trackId: string,
   buyerWallet: string,
-  paymentMethod: 'metamask' | 'stripe'
+  paymentMethod: 'metamask' | 'phantom' | 'stripe',
+  blockchain?: 'ethereum' | 'solana'
 ): Promise<{ success: boolean; transactionHash?: string; track: Track }> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -231,8 +243,10 @@ export async function purchaseTrack(
       tracks[trackIndex] = purchasedTrack
       saveMarketplaceTracks(tracks)
 
-      const transactionHash = paymentMethod === 'metamask' 
-        ? `0x${Math.random().toString(16).substring(2, 66)}` 
+      const transactionHash = paymentMethod === 'metamask' || paymentMethod === 'phantom'
+        ? (blockchain === 'solana' || track.blockchain === 'solana')
+          ? generateSolanaTransactionHash()
+          : `0x${Math.random().toString(16).substring(2, 66)}`
         : undefined
 
       resolve({
@@ -244,11 +258,33 @@ export async function purchaseTrack(
   })
 }
 
+function generateSolanaTransactionHash(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+  for (let i = 0; i < 88; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
 export async function simulateMetaMaskConnection(): Promise<string> {
   return new Promise((resolve) => {
     setTimeout(() => {
       const mockWalletAddress = `0x${Math.random().toString(16).substring(2, 42)}`
       resolve(mockWalletAddress)
+    }, 1000)
+  })
+}
+
+export async function simulatePhantomConnection(): Promise<string> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789'
+      let address = ''
+      for (let i = 0; i < 44; i++) {
+        address += chars.charAt(Math.floor(Math.random() * chars.length))
+      }
+      resolve(address)
     }, 1000)
   })
 }

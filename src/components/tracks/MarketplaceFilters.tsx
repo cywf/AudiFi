@@ -30,6 +30,13 @@ export function MarketplaceFiltersPanel({ filters, onFiltersChange, genres }: Ma
     })
   }
 
+  const handleBlockchainChange = (value: string) => {
+    onFiltersChange({ 
+      ...filters, 
+      blockchain: value === 'all' ? undefined : value as 'ethereum' | 'solana'
+    })
+  }
+
   const handleMinPriceChange = (value: string) => {
     const numValue = parseFloat(value)
     onFiltersChange({ 
@@ -51,11 +58,11 @@ export function MarketplaceFiltersPanel({ filters, onFiltersChange, genres }: Ma
     setShowAdvanced(false)
   }
 
-  const hasActiveFilters = filters.search || filters.genre || filters.minPrice !== undefined || filters.maxPrice !== undefined
+  const hasActiveFilters = filters.search || filters.genre || filters.blockchain || filters.minPrice !== undefined || filters.maxPrice !== undefined
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="md:col-span-1">
           <Label htmlFor="search" className="sr-only">Search</Label>
           <div className="relative">
@@ -83,6 +90,20 @@ export function MarketplaceFiltersPanel({ filters, onFiltersChange, genres }: Ma
                   {genre}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label htmlFor="blockchain" className="sr-only">Blockchain</Label>
+          <Select value={filters.blockchain || 'all'} onValueChange={handleBlockchainChange}>
+            <SelectTrigger id="blockchain">
+              <SelectValue placeholder="All Blockchains" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Blockchains</SelectItem>
+              <SelectItem value="ethereum">Ethereum</SelectItem>
+              <SelectItem value="solana">Solana</SelectItem>
             </SelectContent>
           </Select>
         </div>

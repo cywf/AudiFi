@@ -76,11 +76,11 @@ Empowering independent music artists to mint their tracks as one-of-one NFTs, re
 - **Success criteria**: Pricing tiers clearly differentiated, CTAs trigger appropriate stub functions
 
 ### NFT Tracks Marketplace
-- **Functionality**: Primary marketplace displaying all minted and listed NFT tracks available for purchase, with filtering by genre/price/artist, search functionality, sorting options, and purchase flow with MetaMask/Stripe integration placeholders
-- **Purpose**: Serve as the primary discovery and sales platform where artists list their tracks and buyers can browse and purchase NFTs, creating the core value exchange of the platform
+- **Functionality**: Primary marketplace displaying all minted and listed NFT tracks available for purchase on both Ethereum and Solana blockchains, with filtering by genre/price/artist/blockchain, search functionality, sorting options, and purchase flow with MetaMask (Ethereum)/Phantom (Solana)/Stripe integration placeholders
+- **Purpose**: Serve as the primary discovery and sales platform where artists list their tracks and buyers can browse and purchase NFTs on their preferred blockchain, creating the core value exchange of the platform with multi-chain support
 - **Trigger**: Navigation link from main header, dashboard CTA, or direct URL access
-- **Progression**: Browse marketplace grid → Filter/search tracks → View track details → Connect wallet (MetaMask simulation) → Select payment method (Stripe/ETH) → Complete purchase → Confirmation with NFT transfer simulation
-- **Success criteria**: All listed tracks display correctly, filters work reactively, purchase flow completes with loading states, mock blockchain transaction shows success with transaction hash, purchased tracks update to show new owner
+- **Progression**: Browse marketplace grid → Filter/search tracks by blockchain → View track details with blockchain badge → Connect wallet (MetaMask for Ethereum or Phantom for Solana simulation) → Select payment method (Stripe/ETH/SOL) → Complete purchase → Confirmation with NFT transfer simulation and blockchain-specific transaction hash
+- **Success criteria**: All listed tracks display correctly with blockchain badges (Ethereum/Solana), filters work reactively including blockchain filter, purchase flow completes with loading states, mock blockchain transaction shows success with appropriate transaction hash format (0x... for Ethereum, base58 for Solana), purchased tracks update to show new owner
 
 ## Edge Case Handling
 - **Empty States**: Dashboard with no tracks shows encouraging empty state with "Create Your First Track" CTA
