@@ -1,5 +1,7 @@
 import type { Track } from '@/types'
 
+const STORAGE_KEY = 'nftTracks.marketplace'
+
 const mockMarketplaceTracks: Track[] = [
   {
     id: 'track_market_001',
@@ -136,16 +138,16 @@ const mockMarketplaceTracks: Track[] = [
 ]
 
 function getMarketplaceTracks(): Track[] {
-  const stored = localStorage.getItem('marketplace-tracks')
+  const stored = localStorage.getItem(STORAGE_KEY)
   if (stored) {
     return JSON.parse(stored)
   }
-  localStorage.setItem('marketplace-tracks', JSON.stringify(mockMarketplaceTracks))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(mockMarketplaceTracks))
   return mockMarketplaceTracks
 }
 
 function saveMarketplaceTracks(tracks: Track[]): void {
-  localStorage.setItem('marketplace-tracks', JSON.stringify(tracks))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tracks))
 }
 
 export interface MarketplaceFilters {

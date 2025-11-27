@@ -1,5 +1,7 @@
 import type { SubscriptionPlan } from '@/types'
 
+const USER_STORAGE_KEY = 'nftTracks.currentUser'
+
 const mockPlans: SubscriptionPlan[] = [
   {
     id: 'plan_free',
@@ -41,7 +43,7 @@ export async function getPlans(): Promise<SubscriptionPlan[]> {
 export async function getCurrentUserPlan(): Promise<SubscriptionPlan> {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const storedUser = localStorage.getItem('currentUser')
+      const storedUser = localStorage.getItem(USER_STORAGE_KEY)
       const user = storedUser ? JSON.parse(storedUser) : { subscriptionPlan: 'FREE' }
       const plan = mockPlans.find(p => p.id === `plan_${user.subscriptionPlan.toLowerCase()}`)
       resolve(plan || mockPlans[0])
