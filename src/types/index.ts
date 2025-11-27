@@ -64,3 +64,22 @@ export interface CreateTrackPayload {
   currentPrice?: number
   currency?: "ETH" | "USD"
 }
+
+export interface UserProfile {
+  displayName: string
+  bio: string
+  avatarUrl: string
+  socialMedia: {
+    instagram: string
+    twitter: string
+    tiktok: string
+    youtube: string
+  }
+  musicPlatforms: {
+    spotify: string
+    appleMusic: string
+    soundcloud: string
+    bandcamp: string
+  }
+  twoFactorEnabled: boolean
+}

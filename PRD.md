@@ -12,6 +12,20 @@ Empowering independent music artists to mint their tracks as one-of-one NFTs, re
 
 ## Essential Features
 
+### User Profile Management
+- **Functionality**: Comprehensive artist profile page allowing artists to customize their identity with profile picture, bio, social media links (Instagram, Twitter/X, TikTok, YouTube), music platform profiles (Spotify, Apple Music, SoundCloud, Bandcamp), and security settings including two-factor authentication with Google Authenticator or similar apps
+- **Purpose**: Give artists complete control over their public persona and account security, building credibility and trust with potential buyers while protecting valuable digital assets
+- **Trigger**: Navigation link from navbar profile icon, settings page, or dashboard onboarding
+- **Progression**: Upload profile picture → Enter artist name and bio → Link social media accounts → Connect music platforms → Set up 2FA → Save profile
+- **Success criteria**: Profile data persists using useKV, image upload works with size validation, 2FA setup generates QR code and validates 6-digit codes, all social/platform links save correctly
+
+### Account Creation & Signup
+- **Functionality**: User-friendly signup flow collecting artist name, email, password with validation, terms acceptance, and automatic profile initialization
+- **Purpose**: Streamline artist onboarding while ensuring security standards and legal compliance from the start
+- **Trigger**: "Get Started" CTA on landing page, navbar signup link, or unauthenticated access attempt
+- **Progression**: Enter artist details → Set secure password → Accept terms → Create account → Initialize profile → Redirect to dashboard
+- **Success criteria**: Form validates all inputs, password strength enforced, profile created in persistence layer, smooth redirect to dashboard with welcome message
+
 ### Why NFT Tracks Page
 - **Functionality**: Educational page explaining the problems independent artists face with traditional music monetization, the NFT Tracks solution with 10% perpetual royalties, and the shift to track-level ROI thinking
 - **Purpose**: Help artists understand the fundamental value proposition of NFT minting versus traditional distribution, building conviction in the platform's fairness

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { MusicNote } from '@phosphor-icons/react'
+import { MusicNote, User } from '@phosphor-icons/react'
 
 export function NavBar() {
   return (
@@ -33,6 +33,11 @@ export function NavBar() {
             <Link to="/pricing">
               <Button variant="ghost" size="sm" className="hover:bg-accent/10 hover:text-accent-foreground">
                 Pricing
+              </Button>
+            </Link>
+            <Link to="/profile">
+              <Button variant="ghost" size="sm" className="hover:bg-accent/10 hover:text-accent-foreground">
+                <User size={18} weight="duotone" />
               </Button>
             </Link>
           </nav>

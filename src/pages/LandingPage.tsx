@@ -70,9 +70,9 @@ export function LandingPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-                <Link to="/tracks/new" className="w-full sm:w-auto">
+                <Link to="/signup" className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto gap-2 text-base font-semibold px-8 h-12">
-                    Launch Your First NFT Track
+                    Get Started Free
                     <ArrowRight size={20} weight="bold" />
                   </Button>
                 </Link>
