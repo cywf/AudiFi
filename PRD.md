@@ -75,6 +75,13 @@ Empowering independent music artists to mint their tracks as one-of-one NFTs, re
 - **Progression**: View tier comparison → Click upgrade → Simulate Stripe redirect → Show placeholder modal
 - **Success criteria**: Pricing tiers clearly differentiated, CTAs trigger appropriate stub functions
 
+### NFT Tracks Marketplace
+- **Functionality**: Primary marketplace displaying all minted and listed NFT tracks available for purchase, with filtering by genre/price/artist, search functionality, sorting options, and purchase flow with MetaMask/Stripe integration placeholders
+- **Purpose**: Serve as the primary discovery and sales platform where artists list their tracks and buyers can browse and purchase NFTs, creating the core value exchange of the platform
+- **Trigger**: Navigation link from main header, dashboard CTA, or direct URL access
+- **Progression**: Browse marketplace grid → Filter/search tracks → View track details → Connect wallet (MetaMask simulation) → Select payment method (Stripe/ETH) → Complete purchase → Confirmation with NFT transfer simulation
+- **Success criteria**: All listed tracks display correctly, filters work reactively, purchase flow completes with loading states, mock blockchain transaction shows success with transaction hash, purchased tracks update to show new owner
+
 ## Edge Case Handling
 - **Empty States**: Dashboard with no tracks shows encouraging empty state with "Create Your First Track" CTA
 - **Form Validation**: Creation wizard validates required fields and shows inline errors before allowing progression

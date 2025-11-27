@@ -8,7 +8,8 @@ import {
   ChartLine, 
   Wallet,
   CloudArrowUp,
-  CurrencyEth
+  CurrencyEth,
+  Storefront
 } from '@phosphor-icons/react'
 import { NavBar } from '@/components/layout/NavBar'
 
@@ -135,6 +136,27 @@ export function LandingPage() {
             <Button variant="outline" size="lg" className="gap-2 border-border/60 hover:bg-accent/10 hover:border-accent/40">
               See How It Works
               <ArrowRight size={20} />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 bg-gradient-to-b from-background to-card/30">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/10 mb-4">
+            <Storefront size={36} weight="duotone" className="text-accent" />
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold">
+            Discover Unique Music NFTs
+          </h2>
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Browse the marketplace to find exclusive tracks from independent artists around the world. 
+            Every purchase supports creators directly and earns them royalties forever.
+          </p>
+          <Link to="/marketplace">
+            <Button size="lg" variant="secondary" className="gap-2 text-base font-semibold px-8 h-12 mt-4">
+              <Storefront size={20} weight="duotone" />
+              Browse Marketplace
             </Button>
           </Link>
         </div>

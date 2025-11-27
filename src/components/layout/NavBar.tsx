@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { MusicNote, User } from '@phosphor-icons/react'
+import { MusicNote, User, Storefront } from '@phosphor-icons/react'
 
 export function NavBar() {
   return (
@@ -15,6 +15,12 @@ export function NavBar() {
           </Link>
 
           <nav className="flex items-center gap-2">
+            <Link to="/marketplace">
+              <Button variant="ghost" size="sm" className="hidden md:inline-flex gap-2 hover:bg-accent/10 hover:text-accent-foreground">
+                <Storefront size={18} weight="duotone" />
+                Marketplace
+              </Button>
+            </Link>
             <Link to="/how-it-works">
               <Button variant="ghost" size="sm" className="hidden sm:inline-flex hover:bg-accent/10 hover:text-accent-foreground">
                 How It Works

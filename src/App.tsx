@@ -10,6 +10,7 @@ import { HowItWorksPage } from '@/pages/HowItWorksPage'
 import { WhyNFTTracksPage } from '@/pages/WhyNFTTracksPage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { SignupPage } from '@/pages/SignupPage'
+import { MarketplacePage } from '@/pages/MarketplacePage'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/why-nft-tracks" element={<WhyNFTTracksPage />} />
+        <Route path="/marketplace" element={<MarketplacePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/tracks/new" element={<CreateTrackPage />} />
         <Route path="/tracks/:id" element={<TrackDetailPage />} />
