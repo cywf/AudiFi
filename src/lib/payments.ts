@@ -16,8 +16,8 @@ export interface CheckoutResult {
 export async function startSubscriptionCheckout(planId: string): Promise<CheckoutResult> {
   return new Promise((resolve) => {
     setTimeout(() => {
-      // Simulate a successful checkout session creation
-      const sessionId = `cs_test_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
+      // Use crypto.randomUUID for unique session IDs
+      const sessionId = `cs_test_${crypto.randomUUID()}`
       
       // Log for debugging
       console.info(`[Payment Stub] Created checkout session for plan: ${planId}`, { sessionId })
@@ -37,7 +37,7 @@ export async function startSubscriptionCheckout(planId: string): Promise<Checkou
 export async function openCustomerPortal(): Promise<{ url: string }> {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const portalUrl = `https://billing.stripe.com/p/stub_session_${Date.now()}`
+      const portalUrl = `https://billing.stripe.com/p/stub_${crypto.randomUUID()}`
       
       // Log for debugging
       console.info('[Payment Stub] Would open Customer Portal', { portalUrl })
