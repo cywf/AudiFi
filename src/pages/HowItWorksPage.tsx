@@ -14,6 +14,7 @@ import {
   LockKey
 } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
+import { NavBar } from '@/components/layout/NavBar'
 
 export function HowItWorksPage() {
   const steps = [
@@ -89,6 +90,8 @@ export function HowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <NavBar />
+      
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10 pointer-events-none" />
         
@@ -242,6 +245,19 @@ export function HowItWorksPage() {
           </div>
         </div>
       </div>
+
+      <footer className="border-t border-border/60 py-12 bg-card/20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
+            <p>© 2024 NFT Tracks. Empowering independent artists.</p>
+            <div className="flex flex-wrap justify-center gap-8">
+              <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Docs</a>
+              <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Terms</a>
+              <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Privacy</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

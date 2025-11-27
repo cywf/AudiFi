@@ -13,6 +13,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: House },
     { label: 'How It Works', path: '/how-it-works', icon: Article },
+    { label: 'Why NFT Tracks', path: '/why-nft-tracks', icon: ChartBar },
     { label: 'Pricing', path: '/pricing', icon: CreditCard },
     { label: 'Settings', path: '/settings', icon: Gear },
   ]

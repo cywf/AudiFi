@@ -10,6 +10,7 @@ import {
   CloudArrowUp,
   CurrencyEth
 } from '@phosphor-icons/react'
+import { NavBar } from '@/components/layout/NavBar'
 
 export function LandingPage() {
   const features = [
@@ -47,35 +48,12 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <NavBar />
+      
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-background to-accent/8 pointer-events-none" />
         
         <div className="relative">
-          <header className="border-b border-border/30 bg-card/40 backdrop-blur-md sticky top-0 z-50 shadow-sm shadow-border/20">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex h-16 items-center justify-between">
-                <Link to="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
-                  <div className="bg-primary rounded-lg p-2">
-                    <MusicNote size={24} weight="fill" className="text-primary-foreground" />
-                  </div>
-                  <span className="text-xl font-bold">NFT Tracks</span>
-                </Link>
-
-                <div className="flex items-center gap-2">
-                  <Link to="/how-it-works">
-                    <Button variant="ghost" size="sm" className="hidden sm:inline-flex hover:bg-accent/10 hover:text-accent-foreground">How It Works</Button>
-                  </Link>
-                  <Link to="/dashboard">
-                    <Button variant="ghost" size="sm" className="hidden sm:inline-flex hover:bg-accent/10 hover:text-accent-foreground">Dashboard</Button>
-                  </Link>
-                  <Link to="/pricing">
-                    <Button variant="ghost" size="sm" className="hover:bg-accent/10 hover:text-accent-foreground">Pricing</Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </header>
-
           <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-28">
             <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">

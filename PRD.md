@@ -12,6 +12,13 @@ Empowering independent music artists to mint their tracks as one-of-one NFTs, re
 
 ## Essential Features
 
+### Why NFT Tracks Page
+- **Functionality**: Educational page explaining the problems independent artists face with traditional music monetization, the NFT Tracks solution with 10% perpetual royalties, and the shift to track-level ROI thinking
+- **Purpose**: Help artists understand the fundamental value proposition of NFT minting versus traditional distribution, building conviction in the platform's fairness
+- **Trigger**: Navigation link from main header, landing page exploration, or dashboard onboarding
+- **Progression**: View artist challenges in traditional music → Understand NFT Tracks solution → Learn about 10% royalty smart contract mechanics → Grasp track-level ROI concept → CTA to mint first track
+- **Success criteria**: Clear articulation of the problem space, concrete royalty calculation examples, comparison between old/new models, strong emotional resonance with artist pain points
+
 ### How It Works Page
 - **Functionality**: Visual step-by-step guide showing the complete journey from upload to earnings, with animated illustrations and benefit highlights
 - **Purpose**: Demystify the NFT minting process for artists unfamiliar with blockchain, building confidence and reducing onboarding friction

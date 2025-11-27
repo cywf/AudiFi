@@ -7,6 +7,7 @@ import { TrackDetailPage } from '@/pages/TrackDetailPage'
 import { PricingPage } from '@/pages/PricingPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { HowItWorksPage } from '@/pages/HowItWorksPage'
+import { WhyNFTTracksPage } from '@/pages/WhyNFTTracksPage'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
+        <Route path="/why-nft-tracks" element={<WhyNFTTracksPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/tracks/new" element={<CreateTrackPage />} />
         <Route path="/tracks/:id" element={<TrackDetailPage />} />
