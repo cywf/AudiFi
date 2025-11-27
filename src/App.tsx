@@ -6,12 +6,14 @@ import { CreateTrackPage } from '@/pages/CreateTrackPage'
 import { TrackDetailPage } from '@/pages/TrackDetailPage'
 import { PricingPage } from '@/pages/PricingPage'
 import { SettingsPage } from '@/pages/SettingsPage'
+import { HowItWorksPage } from '@/pages/HowItWorksPage'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/tracks/new" element={<CreateTrackPage />} />
         <Route path="/tracks/:id" element={<TrackDetailPage />} />

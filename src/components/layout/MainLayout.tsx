@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { House, ChartBar, CreditCard, Gear, MusicNote } from '@phosphor-icons/react'
+import { House, ChartBar, CreditCard, Gear, MusicNote, Article } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -12,6 +12,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: House },
+    { label: 'How It Works', path: '/how-it-works', icon: Article },
     { label: 'Pricing', path: '/pricing', icon: CreditCard },
     { label: 'Settings', path: '/settings', icon: Gear },
   ]

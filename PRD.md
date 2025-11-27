@@ -12,6 +12,13 @@ Empowering independent music artists to mint their tracks as one-of-one NFTs, re
 
 ## Essential Features
 
+### How It Works Page
+- **Functionality**: Visual step-by-step guide showing the complete journey from upload to earnings, with animated illustrations and benefit highlights
+- **Purpose**: Demystify the NFT minting process for artists unfamiliar with blockchain, building confidence and reducing onboarding friction
+- **Trigger**: Navigation link from main header, landing page CTA, or dashboard onboarding prompt
+- **Progression**: View hero introduction → See 4-step process with icons and details → Review benefits section → CTA to create first track or view pricing
+- **Success criteria**: Clear visual communication of each step, benefits clearly articulated, smooth animations that guide attention, strong conversion CTAs
+
 ### Track Creation Wizard
 - **Functionality**: Multi-step form collecting track details, artwork, release config, and economics (royalties/pricing)
 - **Purpose**: Simplify the complex NFT minting process into digestible steps familiar to musicians releasing music

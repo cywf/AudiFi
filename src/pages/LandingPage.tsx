@@ -62,6 +62,9 @@ export function LandingPage() {
                 </Link>
 
                 <div className="flex items-center gap-2">
+                  <Link to="/how-it-works">
+                    <Button variant="ghost" size="sm" className="hidden sm:inline-flex hover:bg-accent/10 hover:text-accent-foreground">How It Works</Button>
+                  </Link>
                   <Link to="/dashboard">
                     <Button variant="ghost" size="sm" className="hidden sm:inline-flex hover:bg-accent/10 hover:text-accent-foreground">Dashboard</Button>
                   </Link>
@@ -147,6 +150,15 @@ export function LandingPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        <div className="text-center mt-10 md:mt-12">
+          <Link to="/how-it-works">
+            <Button variant="outline" size="lg" className="gap-2 border-border/60 hover:bg-accent/10 hover:border-accent/40">
+              See How It Works
+              <ArrowRight size={20} />
+            </Button>
+          </Link>
         </div>
       </section>
 
