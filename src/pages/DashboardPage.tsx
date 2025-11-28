@@ -62,12 +62,14 @@ export function DashboardPage() {
             value={`${totalSales.toFixed(2)} ETH`}
             icon={<CurrencyEth size={28} weight="duotone" />}
             trend={{ value: '+12% this month', positive: true }}
+            variant="earnings"
           />
           <StatCard
             label="Total Royalties"
             value={`${totalRoyalties.toFixed(3)} ETH`}
             icon={<TrendUp size={28} weight="duotone" />}
             trend={{ value: '+8% this month', positive: true }}
+            variant="earnings"
           />
         </div>
 

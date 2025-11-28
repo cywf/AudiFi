@@ -42,34 +42,51 @@ src/
 ├── api/                    # Mock API layer
 │   ├── user.ts            # User data operations
 │   ├── tracks.ts          # Track CRUD operations
-│   └── subscription.ts    # Subscription/pricing data
+│   ├── subscription.ts    # Subscription/pricing data
+│   └── marketplace.ts     # Marketplace listings and purchases
 ├── components/
 │   ├── layout/            # Layout components
-│   │   └── MainLayout.tsx
+│   │   ├── MainLayout.tsx # Main app layout with nav
+│   │   └── NavBar.tsx     # Landing page navigation
 │   ├── dashboard/         # Dashboard-specific components
-│   │   └── StatCard.tsx
+│   │   └── StatCard.tsx   # Stats display with earnings variant
 │   ├── tracks/            # Track-related components
-│   │   └── TrackCard.tsx
+│   │   ├── TrackCard.tsx
+│   │   ├── MarketplaceTrackCard.tsx
+│   │   ├── MarketplaceFilters.tsx
+│   │   └── PurchaseModal.tsx
 │   ├── pricing/           # Pricing components
 │   │   └── PricingTierCard.tsx
 │   ├── wizard/            # Wizard/form components
 │   │   └── StepIndicator.tsx
+│   ├── profile/           # Profile components
+│   │   ├── SocialMediaLinks.tsx
+│   │   ├── MusicPlatformLinks.tsx
+│   │   └── TwoFactorSetup.tsx
 │   └── ui/                # shadcn UI components
+├── constants/             # App constants
+│   └── index.ts           # Genres, mood tags, config
 ├── lib/                   # Integration stubs and utilities
 │   ├── wallet.ts          # MetaMask wallet stub
 │   ├── payments.ts        # Stripe payment stub
-│   └── utils.ts           # Utility functions
+│   └── utils.ts           # Utility functions (cn, etc.)
 ├── pages/                 # Route pages
-│   ├── LandingPage.tsx
-│   ├── DashboardPage.tsx
-│   ├── CreateTrackPage.tsx
-│   ├── TrackDetailPage.tsx
-│   ├── PricingPage.tsx
-│   └── SettingsPage.tsx
+│   ├── LandingPage.tsx    # Home page with hero
+│   ├── DashboardPage.tsx  # Artist dashboard
+│   ├── CreateTrackPage.tsx # Multi-step track creation wizard
+│   ├── TrackDetailPage.tsx # Individual track view
+│   ├── PricingPage.tsx    # Subscription tiers
+│   ├── SettingsPage.tsx   # Account settings
+│   ├── ProfilePage.tsx    # Artist profile management
+│   ├── SignupPage.tsx     # Account creation
+│   ├── HowItWorksPage.tsx # Educational page
+│   ├── WhyNFTTracksPage.tsx # Value proposition
+│   └── MarketplacePage.tsx # NFT marketplace
 ├── types/                 # TypeScript type definitions
 │   └── index.ts
 ├── App.tsx               # Root app with routing
-├── index.css             # Global styles and theme
+├── index.css             # CSS variables and base styles
+├── main.css              # Tailwind imports and theme mapping
 └── main.tsx              # App entry point
 ```
 
@@ -107,6 +124,33 @@ Multi-step wizard with:
 - Profile information
 - Wallet connection (MetaMask stub)
 - Subscription management
+
+### 7. Marketplace (`/marketplace`)
+- Browse and discover listed NFT tracks
+- Filter by genre, blockchain, and price
+- Multi-blockchain support (Ethereum/Solana simulation)
+- Purchase flow with wallet connection
+
+### 8. Profile Page (`/profile`)
+- Artist profile customization
+- Social media links
+- Music platform links
+- Two-factor authentication setup
+
+### 9. How It Works (`/how-it-works`)
+- Step-by-step guide to the minting process
+- Animated visual walkthrough
+- Benefits of the platform
+
+### 10. Why NFT Tracks (`/why-nft-tracks`)
+- Educational content about music industry challenges
+- Explanation of the 10% perpetual royalty model
+- Track-level ROI concept
+
+### 11. Signup (`/signup`)
+- Account creation flow
+- Terms acceptance
+- Profile initialization
 
 ## 🎨 Design System
 

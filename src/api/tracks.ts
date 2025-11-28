@@ -1,5 +1,7 @@
 import type { Track, CreateTrackPayload } from '@/types'
 
+const STORAGE_KEY = 'nftTracks.tracks'
+
 const mockTracks: Track[] = [
   {
     id: 'track_001',
@@ -60,16 +62,16 @@ const mockTracks: Track[] = [
 ]
 
 function getStoredTracks(): Track[] {
-  const stored = localStorage.getItem('tracks')
+  const stored = localStorage.getItem(STORAGE_KEY)
   if (stored) {
     return JSON.parse(stored)
   }
-  localStorage.setItem('tracks', JSON.stringify(mockTracks))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(mockTracks))
   return mockTracks
 }
 
 function saveTracks(tracks: Track[]): void {
-  localStorage.setItem('tracks', JSON.stringify(tracks))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tracks))
 }
 
 export async function getTracksForCurrentUser(): Promise<Track[]> {
