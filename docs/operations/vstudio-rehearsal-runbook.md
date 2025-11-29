@@ -261,10 +261,12 @@ Add the following decisions:
 
 | Issue | Resolution |
 |-------|------------|
-| WebSocket won't connect | Check ws.staging.audifi.io, verify token |
+| WebSocket won't connect | Check WebSocket endpoint (staging domain TBD), verify token |
 | Vote not counted | Check user eligibility, verify NFT holdings |
 | Decision won't close | Check artist permissions, verify session active |
 | Master won't lock | Ensure all decisions finalized |
+
+> **Note:** Domain names shown above are planned and may differ in actual staging environment.
 
 ---
 

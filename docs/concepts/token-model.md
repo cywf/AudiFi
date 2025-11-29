@@ -65,8 +65,9 @@ ERC-2981 is recognized by:
 - OpenSea
 - Rarible
 - LooksRare
-- Magic Eden (Polygon)
 - AudiFi Marketplace (native)
+
+> **Note:** ERC-2981 support varies by marketplace. Always verify current support before listing.
 
 > **Learn more:** [Mover Advantage](./mover-advantage.md)
 

@@ -24,7 +24,7 @@ This section contains security-related documentation for the AudiFi platform, in
 
 **DO NOT** report security vulnerabilities through public issues.
 
-Instead, email: `opensource-security@github.com`
+Please follow the process outlined in the repository's [SECURITY.md](/SECURITY.md) file.
 
 Include:
 - Type of issue
