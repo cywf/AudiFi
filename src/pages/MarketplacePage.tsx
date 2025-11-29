@@ -52,7 +52,7 @@ export function MarketplacePage() {
               <Storefront size={28} weight="duotone" className="text-accent" />
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">NFT Tracks Marketplace</h1>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">AudiFi Marketplace</h1>
               <p className="text-muted-foreground mt-2 text-sm sm:text-base">
                 Discover and purchase unique music NFTs directly from independent artists
               </p>

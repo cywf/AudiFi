@@ -1,6 +1,6 @@
 import type { Track } from '@/types'
 
-const STORAGE_KEY = 'nftTracks.marketplace'
+const STORAGE_KEY = 'audifi.marketplace'
 
 const mockMarketplaceTracks: Track[] = [
   {
