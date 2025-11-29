@@ -1,4 +1,4 @@
-const WALLET_STORAGE_KEY = 'nftTracks.connectedWallet'
+const WALLET_STORAGE_KEY = 'audifi.connectedWallet'
 
 /**
  * Interface for wallet operations

@@ -1,6 +1,6 @@
 import type { User } from '@/types'
 
-const STORAGE_KEY = 'nftTracks.currentUser'
+const STORAGE_KEY = 'audifi.currentUser'
 
 const mockUser: User = {
   id: 'user_001',

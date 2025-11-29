@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { House, ChartBar, CreditCard, Gear, MusicNote, Article, Storefront } from '@phosphor-icons/react'
+import { House, ChartBar, CreditCard, Gear, MusicNote, Article, Storefront, VideoCamera, Coins, TrendUp } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -11,11 +11,12 @@ export function MainLayout({ children }: MainLayoutProps) {
   const location = useLocation()
 
   const navItems = [
-    { label: 'Dashboard', path: '/dashboard', icon: House },
-    { label: 'Marketplace', path: '/marketplace', icon: Storefront },
-    { label: 'How It Works', path: '/how-it-works', icon: Article },
-    { label: 'Why NFT Tracks', path: '/why-nft-tracks', icon: ChartBar },
-    { label: 'Pricing', path: '/pricing', icon: CreditCard },
+    { label: 'Artist', path: '/artist', icon: House },
+    { label: 'Masters', path: '/artist/masters', icon: MusicNote },
+    { label: 'V Studio', path: '/vstudio/setup', icon: VideoCamera },
+    { label: 'Discover', path: '/discover', icon: Storefront },
+    { label: 'Portfolio', path: '/portfolio', icon: Coins },
+    { label: 'Dividends', path: '/dividends', icon: TrendUp },
     { label: 'Settings', path: '/settings', icon: Gear },
   ]
 
@@ -28,13 +29,13 @@ export function MainLayout({ children }: MainLayoutProps) {
               <div className="bg-primary rounded-lg p-2">
                 <MusicNote size={24} weight="fill" className="text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold">NFT Tracks</span>
+              <span className="text-xl font-bold">AudiFi</span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-2">
               {navItems.map((item) => {
                 const Icon = item.icon
-                const isActive = location.pathname === item.path
+                const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/')
                 return (
                   <Link key={item.path} to={item.path}>
                     <Button
@@ -56,9 +57,9 @@ export function MainLayout({ children }: MainLayoutProps) {
             </nav>
 
             <div className="flex md:hidden items-center gap-2">
-              {navItems.map((item) => {
+              {navItems.slice(0, 5).map((item) => {
                 const Icon = item.icon
-                const isActive = location.pathname === item.path
+                const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/')
                 return (
                   <Link key={item.path} to={item.path}>
                     <Button
@@ -88,7 +89,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <footer className="border-t border-border/60 py-12 mt-auto bg-card/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
-            <p>© 2024 NFT Tracks. Empowering independent artists.</p>
+            <p>© 2024 AudiFi. Empowering independent artists.</p>
             <div className="flex flex-wrap justify-center gap-8">
               <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Docs</a>
               <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Terms</a>
