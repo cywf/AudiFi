@@ -78,7 +78,7 @@ export function SignupPage() {
             <div className="bg-primary rounded-lg p-3">
               <MusicNote size={32} weight="fill" className="text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold">NFT Tracks</span>
+            <span className="text-2xl font-bold">AudiFi</span>
           </Link>
           <h1 className="text-3xl font-bold">Create Your Account</h1>
           <p className="text-muted-foreground">

@@ -11,14 +11,19 @@ export function NavBar() {
             <div className="bg-primary rounded-lg p-2">
               <MusicNote size={24} weight="fill" className="text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold">NFT Tracks</span>
+            <span className="text-xl font-bold">AudiFi</span>
           </Link>
 
           <nav className="flex items-center gap-2">
-            <Link to="/marketplace">
+            <Link to="/marketplace/masters">
               <Button variant="ghost" size="sm" className="hidden md:inline-flex gap-2 hover:bg-accent/10 hover:text-accent-foreground">
                 <Storefront size={18} weight="duotone" />
                 Marketplace
+              </Button>
+            </Link>
+            <Link to="/discover">
+              <Button variant="ghost" size="sm" className="hidden md:inline-flex hover:bg-accent/10 hover:text-accent-foreground">
+                Discover
               </Button>
             </Link>
             <Link to="/how-it-works">
@@ -26,14 +31,14 @@ export function NavBar() {
                 How It Works
               </Button>
             </Link>
-            <Link to="/why-nft-tracks">
+            <Link to="/why-audifi">
               <Button variant="ghost" size="sm" className="hidden sm:inline-flex hover:bg-accent/10 hover:text-accent-foreground">
-                Why NFT Tracks
+                Why AudiFi
               </Button>
             </Link>
-            <Link to="/dashboard">
+            <Link to="/artist">
               <Button variant="ghost" size="sm" className="hidden sm:inline-flex hover:bg-accent/10 hover:text-accent-foreground">
-                Dashboard
+                Artist Dashboard
               </Button>
             </Link>
             <Link to="/pricing">

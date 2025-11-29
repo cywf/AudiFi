@@ -1,6 +1,6 @@
 import type { Track, CreateTrackPayload } from '@/types'
 
-const STORAGE_KEY = 'nftTracks.tracks'
+const STORAGE_KEY = 'audifi.tracks'
 
 const mockTracks: Track[] = [
   {
