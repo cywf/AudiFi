@@ -159,6 +159,8 @@ jobs:
   codeql:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
+    # Continue on error if code scanning is not enabled for this repository
+    continue-on-error: true
     permissions:
       security-events: write
       actions: read
@@ -178,6 +180,8 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:javascript-typescript"
+          # Skip upload if code scanning is not available
+          upload: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
 
   # ============================================
   # Secret Scanning Check
