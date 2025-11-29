@@ -24,6 +24,16 @@ import type {
 } from '../types/index.js';
 
 // =============================================================================
+// CONFIGURATION
+// =============================================================================
+
+/**
+ * Simulated claim processing delay in milliseconds
+ * In production, this would be replaced by actual blockchain confirmation times
+ */
+const SIMULATED_CLAIM_PROCESSING_DELAY_MS = 3000;
+
+// =============================================================================
 // IN-MEMORY STORE (Replace with database in production)
 // =============================================================================
 
@@ -426,7 +436,7 @@ export async function claimDividend(
       };
       dividendContracts.set(contract.id, updatedContract);
     }
-  }, 3000);
+  }, SIMULATED_CLAIM_PROCESSING_DELAY_MS);
 
   return claim;
 }

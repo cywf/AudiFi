@@ -152,15 +152,29 @@ export type BlockchainNetwork =
 
 /**
  * The "Mover Advantage" model for NFT resales
- * Distribution: Artist 10%, 1st Minter 5%, 2nd Minter 3%, 3rd Minter 1%, Seller 81%
+ * Default distribution: Artist 10%, 1st Minter 5%, 2nd Minter 3%, 3rd Minter 1%, Seller 81%
+ * 
+ * Note: Using literal types here to enforce the spec-defined percentages.
+ * For custom configurations, use MoverAdvantageConfigCustom instead.
  */
 export interface MoverAdvantageConfig {
-  artistPercent: 10;
-  firstMinterPercent: 5;
-  secondMinterPercent: 3;
-  thirdMinterPercent: 1;
-  sellerPercent: 81;
+  artistPercent: number;
+  firstMinterPercent: number;
+  secondMinterPercent: number;
+  thirdMinterPercent: number;
+  sellerPercent: number;
 }
+
+/**
+ * Default Mover Advantage percentages as per spec
+ */
+export const DEFAULT_MOVER_ADVANTAGE: Readonly<MoverAdvantageConfig> = {
+  artistPercent: 10,
+  firstMinterPercent: 5,
+  secondMinterPercent: 3,
+  thirdMinterPercent: 1,
+  sellerPercent: 81,
+} as const;
 
 export interface MasterNFTHolder {
   tokenId: number;

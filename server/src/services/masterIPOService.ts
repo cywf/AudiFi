@@ -35,14 +35,15 @@ import * as artistCoinService from './artistCoinService.js';
 
 /**
  * The standard Mover Advantage resale distribution
+ * Uses the default configuration from types
  */
-export const MOVER_ADVANTAGE_CONFIG: MoverAdvantageConfig = {
+export const MOVER_ADVANTAGE_CONFIG: Readonly<MoverAdvantageConfig> = {
   artistPercent: 10,
   firstMinterPercent: 5,
   secondMinterPercent: 3,
   thirdMinterPercent: 1,
   sellerPercent: 81,
-};
+} as const;
 
 // =============================================================================
 // IN-MEMORY STORE (Replace with database in production)
