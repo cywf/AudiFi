@@ -129,11 +129,18 @@ jobs:
 
       - name: Run ESLint
         run: |
-          npm run lint -- --format json --output-file eslint-results.json || true
+          # Run ESLint with JSON output (allow failure to capture output)
+          npm run lint -- --format json --output-file eslint-results.json 2>/dev/null || true
           
-          # Count issues
-          ERRORS=$(cat eslint-results.json | jq '[.[].errorCount] | add // 0')
-          WARNINGS=$(cat eslint-results.json | jq '[.[].warningCount] | add // 0')
+          # Parse results only if file exists and is valid JSON
+          if [ -f eslint-results.json ] && jq empty eslint-results.json 2>/dev/null; then
+            ERRORS=$(jq '[.[].errorCount] | add // 0' eslint-results.json)
+            WARNINGS=$(jq '[.[].warningCount] | add // 0' eslint-results.json)
+          else
+            echo "Warning: ESLint JSON output not available, running standard lint"
+            ERRORS=0
+            WARNINGS=0
+          fi
           
           echo "## 🔍 Static Analysis Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -142,8 +149,15 @@ jobs:
           echo "| Errors | $ERRORS |" >> $GITHUB_STEP_SUMMARY
           echo "| Warnings | $WARNINGS |" >> $GITHUB_STEP_SUMMARY
           
-          # Run lint again to get proper exit code
+          # Run lint to get proper exit code (0 errors = success)
           npm run lint
+          
+          # Only fail if there are actual errors (not warnings)
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Build failed due to ESLint errors**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
 
       - name: Upload ESLint results
         uses: actions/upload-artifact@v4
