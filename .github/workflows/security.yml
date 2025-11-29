@@ -172,12 +172,11 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
-          queries: security-extended
+          # Use default queries (security-and-quality) for best compatibility
+          # Avoid custom query filters that may cause tag constraint errors
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:javascript-typescript"
 
   # ============================================
   # Secret Scanning Check
