@@ -11,7 +11,7 @@ import {
   Coins,
   ArrowRight,
   HandCoins,
-  Infinity,
+  Infinity as InfinityIcon,
   TreeStructure,
   VideoCamera,
   Users,
@@ -45,7 +45,7 @@ export function WhyAudiFiPage() {
       description: 'Launch an IPO for your music master. Sell NFT shares to fans who become stakeholders in your success, receiving dividends from streaming and sales.',
     },
     {
-      icon: <Infinity size={32} weight="duotone" className="text-accent" />,
+      icon: <InfinityIcon size={32} weight="duotone" className="text-accent" />,
       title: 'Mover Advantage',
       description: 'Early supporters earn more. First minter gets 10%, second gets 5%, third gets 3%, 4th+ gets 1% on every resale. Forever.',
     },

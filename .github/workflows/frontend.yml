@@ -1,0 +1,269 @@
+# AudiFi Frontend CI/CD Pipeline
+# 
+# This workflow handles building, testing, and deploying the AudiFi frontend
+# application to Vercel (or Fly.io as an alternative).
+#
+# Triggers:
+# - Pull requests: Run lint, test, build, and optionally deploy preview
+# - Push to develop: Deploy to staging environment
+# - Push to main: Deploy to production environment
+
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'tailwind.config.js'
+      - 'index.html'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'tailwind.config.js'
+      - 'index.html'
+      - '.github/workflows/frontend.yml'
+
+# Limit permissions of GITHUB_TOKEN
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ============================================
+  # Build and Lint Job
+  # ============================================
+  build:
+    name: Build & Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+        continue-on-error: false
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  # ============================================
+  # Test Job (when tests are available)
+  # ============================================
+  # test:
+  #   name: Run Tests
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ env.NODE_VERSION }}
+  #         cache: 'npm'
+  #
+  #     - name: Install dependencies
+  #       run: npm ci
+  #
+  #     - name: Run unit tests
+  #       run: npm run test
+  #
+  #     - name: Upload test coverage
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: coverage
+  #         path: coverage/
+  #         retention-days: 7
+
+  # ============================================
+  # Preview Deployment (Pull Requests)
+  # ============================================
+  deploy-preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.preview-url }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Deploy to Vercel (Preview)
+        id: deploy
+        run: |
+          URL=$(npx vercel --token ${{ secrets.VERCEL_TOKEN }} --yes --confirm 2>&1 | tail -1)
+          echo "preview-url=$URL" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Comment Preview URL on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Preview Deployment Ready!**\n\n📱 Preview URL: ${{ steps.deploy.outputs.preview-url }}\n\n_This preview will be updated when you push new changes._`
+            })
+
+  # ============================================
+  # Staging Deployment (develop branch)
+  # ============================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    permissions:
+      contents: read
+    environment:
+      name: staging
+      url: https://staging.audifi.io
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Deploy to Vercel (Staging)
+        run: npx vercel --token ${{ secrets.VERCEL_TOKEN }} --yes --confirm
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_APP_ENV: staging
+          VITE_API_URL: ${{ secrets.STAGING_API_URL }}
+
+      - name: Job Summary
+        run: |
+          echo "## 🎭 Staging Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`develop\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** Staging" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** https://staging.audifi.io" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # Production Deployment (main branch)
+  # ============================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+    environment:
+      name: production
+      url: https://audifi.io
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Deploy to Vercel (Production)
+        run: npx vercel --token ${{ secrets.VERCEL_TOKEN }} --yes --confirm --prod
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_APP_ENV: production
+          VITE_API_URL: ${{ secrets.PRODUCTION_API_URL }}
+
+      - name: Job Summary
+        run: |
+          echo "## 🚀 Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`main\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** Production" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** https://audifi.io" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployed Services" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Master IPO UIs" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ V Studio Dashboards" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Portfolio & Analytics Views" >> $GITHUB_STEP_SUMMARY

@@ -11,7 +11,7 @@ import {
   Coins,
   ArrowRight,
   HandCoins,
-  Infinity,
+  Infinity as InfinityIcon,
   TreeStructure
 } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
@@ -43,7 +43,7 @@ export function WhyNFTTracksPage() {
       description: 'Artists set their own prices and keep 90% of every primary sale. No middlemen taking unfair cuts of your hard work.',
     },
     {
-      icon: <Infinity size={32} weight="duotone" className="text-accent" />,
+      icon: <InfinityIcon size={32} weight="duotone" className="text-accent" />,
       title: '10% Perpetual Royalties',
       description: 'Every time your NFT track resells, you automatically receive 10% of the sale price. Forever. No exceptions. Encoded in the smart contract.',
     },
