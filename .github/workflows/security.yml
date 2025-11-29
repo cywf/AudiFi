@@ -168,29 +168,12 @@ jobs:
           retention-days: 30
 
   # ============================================
-  # CodeQL Analysis (GitHub Advanced Security)
+  # CodeQL Analysis
   # ============================================
-  codeql:
-    name: CodeQL Analysis
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript-typescript
-          # Use default queries (security-and-quality) for best compatibility
-          # Avoid custom query filters that may cause tag constraint errors
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+  # NOTE: CodeQL is handled by GitHub's default code scanning setup.
+  # Do NOT add a custom CodeQL job here as it conflicts with the default setup.
+  # To configure CodeQL, use the repository's Security tab > Code scanning settings.
+  # ============================================
 
   # ============================================
   # Secret Scanning Check
