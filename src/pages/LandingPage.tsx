@@ -9,7 +9,11 @@ import {
   Wallet,
   CloudArrowUp,
   CurrencyEth,
-  Storefront
+  Storefront,
+  VideoCamera,
+  Coins,
+  TrendUp,
+  Users,
 } from '@phosphor-icons/react'
 import { NavBar } from '@/components/layout/NavBar'
 
@@ -17,33 +21,33 @@ export function LandingPage() {
   const features = [
     {
       icon: <MusicNote size={32} weight="duotone" />,
-      title: 'Own Your Masters',
-      description: 'Keep 100% ownership of your music. No labels, no middlemen, just you and your art.',
+      title: 'Master IPO',
+      description: 'Launch an IPO for your music master. Fans buy NFT shares and become stakeholders in your success.',
     },
     {
-      icon: <CurrencyEth size={32} weight="duotone" />,
-      title: 'Perpetual Royalties',
-      description: 'Get paid on every resale, forever. Smart contracts ensure you never miss a royalty payment.',
+      icon: <VideoCamera size={32} weight="duotone" />,
+      title: 'V Studio',
+      description: 'Bring fans into your creative process with live production sessions where they vote on decisions.',
     },
     {
-      icon: <CloudArrowUp size={32} weight="duotone" />,
-      title: 'IPFS Storage',
-      description: 'Your tracks are stored permanently on the decentralized web, immune to censorship.',
+      icon: <TrendUp size={32} weight="duotone" />,
+      title: 'Mover Advantage',
+      description: 'Early supporters earn 10/5/3/1% on every resale. Reward believers, not just listeners.',
     },
     {
-      icon: <Lock size={32} weight="duotone" />,
-      title: 'Blockchain Verified',
-      description: 'Provable ownership and authenticity through immutable blockchain records.',
+      icon: <Coins size={32} weight="duotone" />,
+      title: 'Dividends',
+      description: 'NFT holders receive automatic dividend payouts when your master generates revenue.',
     },
     {
-      icon: <ChartLine size={32} weight="duotone" />,
-      title: 'Analytics Dashboard',
-      description: 'Track your sales, royalties, and audience engagement in real-time.',
+      icon: <Users size={32} weight="duotone" />,
+      title: 'Artist Coin',
+      description: 'Create your own social token for fan engagement, gated content, and community rewards.',
     },
     {
       icon: <Wallet size={32} weight="duotone" />,
-      title: 'Easy Payments',
-      description: 'Accept crypto via MetaMask or traditional payments through Stripe.',
+      title: 'Web3 Native',
+      description: 'Connect your wallet, mint NFTs, and receive payments in crypto or fiat. Your choice.',
     },
   ]
 
@@ -58,28 +62,28 @@ export function LandingPage() {
           <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-28">
             <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
-                Dream it.{' '}
+                Launch a{' '}
                 <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                  Mint it.
+                  Master IPO.
                 </span>{' '}
-                Get paid on every resale.
+                Own your music. Share the success.
               </h1>
 
               <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                The first platform built for independent artists to mint their music as NFTs, 
-                retain full ownership, and earn perpetual royalties on every single resale.
+                AudiFi lets artists sell NFT shares of their music masters, bring fans into the creative process 
+                with V Studio, and distribute dividends automatically through smart contracts.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-                <Link to="/signup" className="w-full sm:w-auto">
+                <Link to="/master-ipo/create" className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto gap-2 text-base font-semibold px-8 h-12">
-                    Get Started Free
+                    Create Master IPO
                     <ArrowRight size={20} weight="bold" />
                   </Button>
                 </Link>
-                <Link to="/dashboard" className="w-full sm:w-auto">
+                <Link to="/discover" className="w-full sm:w-auto">
                   <Button size="lg" variant="secondary" className="w-full sm:w-auto text-base font-semibold px-8 h-12">
-                    Go to Dashboard
+                    Discover Masters
                   </Button>
                 </Link>
               </div>
@@ -87,15 +91,15 @@ export function LandingPage() {
               <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm pt-6">
                 <div className="flex items-center gap-2">
                   <CheckBadge />
-                  <span className="text-muted-foreground">No upfront costs</span>
+                  <span className="text-muted-foreground">NFT Ownership</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckBadge />
-                  <span className="text-muted-foreground">Keep 100% ownership</span>
+                  <span className="text-muted-foreground">Automatic Dividends</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckBadge />
-                  <span className="text-muted-foreground">Lifetime royalties</span>
+                  <span className="text-muted-foreground">Mover Advantage Royalties</span>
                 </div>
               </div>
             </div>
@@ -106,10 +110,10 @@ export function LandingPage() {
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold mb-3">
-            Everything you need to succeed as an independent artist
+            The complete platform for music ownership
           </h2>
           <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
-            Built for musicians, by musicians. No blockchain knowledge required.
+            Master IPOs, V Studio sessions, Artist Coins, and dividend contracts—all in one place.
           </p>
         </div>
 
@@ -147,13 +151,13 @@ export function LandingPage() {
             <Storefront size={36} weight="duotone" className="text-accent" />
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold">
-            Discover Unique Music NFTs
+            Discover Master IPOs
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Browse the marketplace to find exclusive tracks from independent artists around the world. 
-            Every purchase supports creators directly and earns them royalties forever.
+            Browse the marketplace to invest in music from independent artists. 
+            Become a stakeholder, earn dividends, and benefit from Mover Advantage royalties.
           </p>
-          <Link to="/marketplace">
+          <Link to="/marketplace/masters">
             <Button size="lg" variant="secondary" className="gap-2 text-base font-semibold px-8 h-12 mt-4">
               <Storefront size={20} weight="duotone" />
               Browse Marketplace
@@ -168,11 +172,11 @@ export function LandingPage() {
             Ready to take control of your music career?
           </h2>
           <p className="text-base sm:text-lg text-foreground/80 max-w-xl mx-auto">
-            Join the independent artist revolution. Start minting today.
+            Join independent artists who are building real fan communities and earning what they deserve.
           </p>
-          <Link to="/tracks/new">
+          <Link to="/master-ipo/create">
             <Button size="lg" className="gap-2 text-base font-semibold px-8 h-12 mt-2">
-              Create Your First NFT Track
+              Create Your First Master IPO
               <ArrowRight size={20} weight="bold" />
             </Button>
           </Link>
@@ -182,7 +186,7 @@ export function LandingPage() {
       <footer className="border-t border-border/60 py-12 mt-8 bg-card/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
-            <p>© 2024 NFT Tracks. Empowering independent artists.</p>
+            <p>© 2024 AudiFi. Empowering independent artists.</p>
             <div className="flex flex-wrap justify-center gap-8">
               <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Docs</a>
               <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Terms</a>
