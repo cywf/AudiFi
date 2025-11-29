@@ -72,8 +72,10 @@ export const users = pgTable('users', {
   emailVerified: boolean('email_verified').notNull().default(false),
   
   // Two-factor authentication
+  // SECURITY NOTE: twoFactorSecret must be encrypted at application level using AES-256
+  // before storing. Drizzle does not provide column-level encryption; implement in service layer.
   twoFactorEnabled: boolean('two_factor_enabled').notNull().default(false),
-  twoFactorSecret: varchar('two_factor_secret', { length: 255 }), // Encrypted
+  twoFactorSecret: varchar('two_factor_secret', { length: 255 }),
   
   // Timestamps
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

@@ -268,11 +268,14 @@ export const paymentProviders = pgTable('payment_providers', {
   supportedRegions: jsonb('supported_regions').$type<string[]>(),
   
   // Webhooks
+  // SECURITY NOTE: webhookSecret and configJson contain sensitive data and must be
+  // encrypted at application level using AES-256 before storing. Implement encryption
+  // in the service layer before database operations.
   webhookEndpoint: text('webhook_endpoint'),
-  webhookSecret: text('webhook_secret'), // Encrypted
+  webhookSecret: text('webhook_secret'),
   
   // Metadata
-  configJson: text('config_json'), // Encrypted JSON for provider-specific config
+  configJson: text('config_json'),
   
   // Timestamps
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
