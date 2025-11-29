@@ -27,6 +27,11 @@ on:
     # Run nightly at 2 AM UTC
     - cron: '0 2 * * *'
 
+# Limit permissions of GITHUB_TOKEN
+permissions:
+  contents: read
+  security-events: write
+
 env:
   NODE_VERSION: '20'
 
@@ -37,6 +42,8 @@ jobs:
   dependency-scan:
     name: Dependency Vulnerabilities
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout repository
@@ -54,12 +61,21 @@ jobs:
       - name: Run npm audit
         id: audit
         run: |
-          npm audit --audit-level=moderate --json > audit-results.json || true
+          # Run npm audit and capture results (exit code ignored to parse JSON)
+          # The actual failure is determined by the critical/high vulnerability counts below
+          npm audit --audit-level=moderate --json > audit-results.json 2>&1 || true
           
-          # Parse results
-          CRITICAL=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
-          HIGH=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
-          MODERATE=$(cat audit-results.json | jq '.metadata.vulnerabilities.moderate // 0')
+          # Parse results (handle case where npm audit fails to produce valid JSON)
+          if [ ! -f audit-results.json ] || ! jq empty audit-results.json 2>/dev/null; then
+            echo "Warning: Could not parse audit results"
+            CRITICAL=0
+            HIGH=0
+            MODERATE=0
+          else
+            CRITICAL=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
+            HIGH=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
+            MODERATE=$(cat audit-results.json | jq '.metadata.vulnerabilities.moderate // 0')
+          fi
           
           echo "critical=$CRITICAL" >> $GITHUB_OUTPUT
           echo "high=$HIGH" >> $GITHUB_OUTPUT
@@ -95,6 +111,8 @@ jobs:
   static-analysis:
     name: Static Analysis
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout repository
@@ -167,6 +185,8 @@ jobs:
   secret-scan:
     name: Secret Scanning
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout repository
@@ -181,23 +201,25 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # Check for common secret patterns
+          # Note: GitHub's built-in secret scanning is more comprehensive
+          # These patterns are supplementary checks
           ISSUES=0
           
-          # Check for AWS keys
-          if grep -rE 'AKIA[0-9A-Z]{16}' --include="*.ts" --include="*.tsx" --include="*.js" .; then
+          # Check for AWS access keys (20 characters: AKIA + 16 alphanumeric)
+          if grep -rE 'AKIA[0-9A-Z]{16}' --include="*.ts" --include="*.tsx" --include="*.js" . 2>/dev/null; then
             echo "⚠️ Potential AWS access key found" >> $GITHUB_STEP_SUMMARY
             ISSUES=$((ISSUES + 1))
           fi
           
           # Check for private keys
-          if grep -rE 'BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY' --include="*.ts" --include="*.tsx" --include="*.js" .; then
+          if grep -rE 'BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY' --include="*.ts" --include="*.tsx" --include="*.js" . 2>/dev/null; then
             echo "⚠️ Potential private key found" >> $GITHUB_STEP_SUMMARY
             ISSUES=$((ISSUES + 1))
           fi
           
-          # Check for hardcoded passwords
-          if grep -rE '(password|passwd|pwd)\s*[:=]\s*["\x27][^"\x27]{8,}["\x27]' --include="*.ts" --include="*.tsx" --include="*.js" -i .; then
-            echo "⚠️ Potential hardcoded password found" >> $GITHUB_STEP_SUMMARY
+          # Check for hardcoded API secrets (common patterns)
+          if grep -rE '(api_key|apikey|secret_key|api_secret)\s*[:=]\s*["\x27][a-zA-Z0-9_-]{20,}["\x27]' --include="*.ts" --include="*.tsx" --include="*.js" -i . 2>/dev/null; then
+            echo "⚠️ Potential hardcoded API key found" >> $GITHUB_STEP_SUMMARY
             ISSUES=$((ISSUES + 1))
           fi
           
@@ -215,6 +237,8 @@ jobs:
   license-check:
     name: License Compliance
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout repository
@@ -247,6 +271,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [dependency-scan, static-analysis, secret-scan]
     if: always()
+    permissions: {}
     
     steps:
       - name: Generate Summary

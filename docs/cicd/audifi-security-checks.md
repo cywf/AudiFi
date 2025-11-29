@@ -262,15 +262,19 @@ In `.github/workflows/security.yml`:
 
 ### Ignore Specific Vulnerabilities
 
-Create `.nsprc` file:
+### Ignore Specific Vulnerabilities
+
+Use npm's built-in overrides in `package.json`:
 
 ```json
 {
-  "advisories": {
-    "1234": "False positive - not exploitable in our context"
+  "overrides": {
+    "vulnerable-package": "^2.0.0"
   }
 }
 ```
+
+Or use `npm audit fix --force` with caution for automatic updates.
 
 ### Custom ESLint Rules
 

@@ -40,6 +40,11 @@ on:
       - 'index.html'
       - '.github/workflows/frontend.yml'
 
+# Limit permissions of GITHUB_TOKEN
+permissions:
+  contents: read
+  pull-requests: write
+
 env:
   NODE_VERSION: '20'
 
@@ -50,6 +55,8 @@ jobs:
   build:
     name: Build & Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout repository
@@ -117,6 +124,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
     environment:
       name: preview
       url: ${{ steps.deploy.outputs.preview-url }}
@@ -177,6 +187,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    permissions:
+      contents: read
     environment:
       name: staging
       url: https://staging.audifi.io
@@ -198,6 +210,8 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Pull Vercel Environment
+        # Note: Vercel uses 'preview' for non-production deployments
+        # Staging-specific configuration is handled via VITE_* environment variables
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -235,6 +249,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
     environment:
       name: production
       url: https://audifi.io

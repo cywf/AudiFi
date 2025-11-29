@@ -157,7 +157,11 @@ Configure these secrets in GitHub repository settings:
 1. **VERCEL_TOKEN:**
    ```bash
    # Visit: https://vercel.com/account/tokens
-   # Create a new token with appropriate scope
+   # Create a new token with "Full Account" scope for deployment access
+   # The token needs permissions for:
+   # - Read/Write deployments
+   # - Read project configuration
+   # - Read/Write environment variables
    ```
 
 2. **VERCEL_ORG_ID & VERCEL_PROJECT_ID:**
@@ -165,11 +169,13 @@ Configure these secrets in GitHub repository settings:
    # Install Vercel CLI locally
    npm i -g vercel
    
-   # Link your project
+   # Link your project (follow prompts)
    vercel link
    
    # Find IDs in .vercel/project.json
    cat .vercel/project.json
+   # Example output:
+   # {"orgId":"team_xxxx","projectId":"prj_yyyy"}
    ```
 
 ## Preview URL Behavior
