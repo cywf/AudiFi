@@ -1,0 +1,168 @@
+# =============================================================================
+# AudiFi Caddyfile - Reverse Proxy Configuration
+# =============================================================================
+# 
+# This Caddyfile configures Caddy as the reverse proxy for AudiFi.
+# Features:
+#   - Automatic HTTPS with Let's Encrypt
+#   - Request routing to backend services
+#   - Security headers
+#   - Rate limiting
+#   - Logging
+#
+# For local development, replace domain names with localhost:80
+# =============================================================================
+
+{
+    # Global options
+    email admin@audifi.io
+    
+    # Uncomment for staging certificates (avoid rate limits during testing)
+    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+# =============================================================================
+# API Gateway - api.audifi.io
+# =============================================================================
+api.audifi.io {
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+        -Server
+    }
+
+    # CORS headers for API
+    @cors_preflight method OPTIONS
+    handle @cors_preflight {
+        header Access-Control-Allow-Origin "https://app.audifi.io"
+        header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        header Access-Control-Allow-Headers "Content-Type, Authorization, X-Request-Id"
+        header Access-Control-Allow-Credentials "true"
+        header Access-Control-Max-Age "86400"
+        respond 204
+    }
+
+    # Add CORS headers to all responses
+    header Access-Control-Allow-Origin "https://app.audifi.io"
+    header Access-Control-Allow-Credentials "true"
+
+    # Health check endpoint (no rate limiting)
+    handle /health {
+        reverse_proxy api-server:3000
+    }
+
+    # API v1 routes
+    handle /v1/* {
+        # Rate limiting: 100 requests per minute per IP
+        rate_limit {
+            zone api_zone {
+                key {remote_host}
+                events 100
+                window 1m
+            }
+        }
+        reverse_proxy api-server:3000
+    }
+
+    # WebSocket routes
+    handle /ws/* {
+        reverse_proxy ws-server:3001
+    }
+
+    # Webhook routes (no rate limiting - verified by signature)
+    handle /webhooks/* {
+        reverse_proxy api-server:3000
+    }
+
+    # Metrics endpoint (internal only - restrict in production)
+    handle /metrics {
+        # In production, add IP restriction:
+        # @internal remote_ip 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+        # respond @internal 403
+        reverse_proxy api-server:3000
+    }
+
+    # Fallback - return 404 for unmatched routes
+    handle {
+        respond "Not Found" 404
+    }
+
+    # Access logging
+    log {
+        output file /var/log/caddy/api.audifi.io.access.log {
+            roll_size 100mb
+            roll_keep 10
+            roll_keep_for 720h
+        }
+        format json
+    }
+}
+
+# =============================================================================
+# V Studio WebSocket - studio.audifi.io (Optional dedicated subdomain)
+# =============================================================================
+studio.audifi.io {
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        -Server
+    }
+
+    # All traffic goes to WebSocket server
+    reverse_proxy ws-server:3001
+
+    # Access logging
+    log {
+        output file /var/log/caddy/studio.audifi.io.access.log {
+            roll_size 100mb
+            roll_keep 10
+            roll_keep_for 720h
+        }
+        format json
+    }
+}
+
+# =============================================================================
+# Grafana Dashboard (Internal - restrict access in production)
+# =============================================================================
+# Uncomment if you want to expose Grafana externally
+# 
+# monitoring.audifi.io {
+#     # Restrict to VPN/internal IPs in production
+#     @allowed remote_ip 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+#     handle @allowed {
+#         reverse_proxy grafana:3000
+#     }
+#     handle {
+#         respond "Forbidden" 403
+#     }
+# }
+
+# =============================================================================
+# Local Development Configuration
+# =============================================================================
+# For local development, uncomment this block and comment out the above
+#
+# :80 {
+#     # API routes
+#     handle /api/* {
+#         uri strip_prefix /api
+#         reverse_proxy api-server:3000
+#     }
+#     
+#     # WebSocket routes
+#     handle /ws/* {
+#         reverse_proxy ws-server:3001
+#     }
+#     
+#     # Frontend (if running locally)
+#     handle {
+#         reverse_proxy frontend:5173
+#     }
+# }

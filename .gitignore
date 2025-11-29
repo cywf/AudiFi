@@ -29,6 +29,16 @@ server/node_modules
 *.sw?
 
 .env
+.env.local
+.env.production
+.env.*.local
+
+# Deployment - sensitive files
+deploy/.env
+deploy/docker-compose.yml
+deploy/Caddyfile
+deploy/nginx.conf
+
 **/agent-eval-report*
 packages
 pids
