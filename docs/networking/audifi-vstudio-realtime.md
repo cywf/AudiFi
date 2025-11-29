@@ -284,10 +284,10 @@ type MessageType =
 
 | Platform | Connection Type | API/Protocol |
 |----------|-----------------|--------------|
-| Twitch | IRC over WebSocket | `wss://irc-ws.chat.twitch.tv` |
+| Twitch | IRC over WebSocket | `wss://irc-ws.chat.twitch.tv:443` |
 | YouTube Live | Polling API | HTTPS REST API |
-| TikTok | WebSocket | `wss://webcast.tiktok.com` |
-| Discord | Bot Gateway | `wss://gateway.discord.gg` |
+| TikTok | WebSocket | `wss://webcast.tiktok.com:443` |
+| Discord | Bot Gateway | `wss://gateway.discord.gg:443` |
 
 ### Normalized Chat Message Format
 
