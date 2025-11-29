@@ -119,6 +119,7 @@ export function VStudioSessionSetupPage() {
 
     setSaving(true)
     try {
+      // TODO: Replace hardcoded user ID/name with actual user context from authentication system
       const session = await createSession(
         formData as CreateVStudioSessionPayload,
         'user_001',

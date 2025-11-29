@@ -32,9 +32,9 @@ import { DEFAULT_MOVER_ADVANTAGE } from '@/types'
 import { toast } from 'sonner'
 
 const WIZARD_STEPS = [
-  { label: 'Master Details', description: 'Track metadata and rights' },
-  { label: 'Share Config', description: 'NFT supply and revenue splits' },
-  { label: 'Preview', description: 'Review and launch' },
+  'Master Details',
+  'Share Config',
+  'Preview',
 ]
 
 export function CreateMasterIPOPage() {
@@ -162,6 +162,7 @@ export function CreateMasterIPOPage() {
     }, 300)
 
     try {
+      // TODO: Replace hardcoded user ID/name with actual user context from authentication system
       const created = await createMasterIPO(
         formData as CreateMasterIPOPayload,
         'user_001',

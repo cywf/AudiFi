@@ -30,7 +30,7 @@ import { toast } from 'sonner'
 export function VStudioLivePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [isArtist] = useState(true) // TODO: Check actual user role
+  const [isArtist] = useState(true) // TODO: Replace with actual user role from auth context when backend is ready
 
   const { session, loading, error, activeDecisionPoint, refresh } = useVStudioSession({
     sessionId: id || '',

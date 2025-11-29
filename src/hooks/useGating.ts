@@ -29,8 +29,8 @@ export function useGatingStatus(gating: SessionGating | undefined): GatingStatus
       return
     }
 
-    // TODO: Check actual NFT/coin balances from smart contracts
-    // For now, simulate access check with mock data
+    // TODO: Replace with actual NFT/coin balance checking via smart contracts when backend is ready
+    // For now, simulate access check with mock data (random for demo purposes)
     const mockCheck = async () => {
       await new Promise((resolve) => setTimeout(resolve, 300))
 
