@@ -4,6 +4,9 @@ import { Slider } from '@/components/ui/slider'
 import { Play, Pause, SpeakerHigh, SpeakerLow, SpeakerNone } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
+/** Mock duration in seconds when no audio source is provided (3 minutes) */
+const MOCK_DURATION_SECONDS = 180
+
 interface AudioPlayerProps {
   /** Source URL for the audio file. If not provided, uses a placeholder */
   src?: string
@@ -93,7 +96,7 @@ export function AudioPlayer({ src, title, className }: AudioPlayerProps) {
   // For demo purposes, if no src provided, use a mock duration
   useEffect(() => {
     if (!src) {
-      setDuration(180) // 3 minute mock duration
+      setDuration(MOCK_DURATION_SECONDS)
     }
   }, [src])
 

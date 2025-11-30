@@ -36,7 +36,6 @@ import {
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 
@@ -248,31 +247,27 @@ export function TrackDetailPage() {
                   <span className="text-muted-foreground text-sm"> • {track.genre}</span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge className={cn('font-medium', statusInfo.className)}>
+                        {statusInfo.label}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Track status: {statusInfo.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  {track.blockchain && (
                     <Tooltip>
                       <TooltipTrigger>
-                        <Badge className={cn('font-medium', statusInfo.className)}>
-                          {statusInfo.label}
+                        <Badge variant="secondary" className="text-xs capitalize">
+                          {track.blockchain}
                         </Badge>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Track status: {statusInfo.label}</p>
+                        <p>This track is on the {track.blockchain === 'ethereum' ? 'Ethereum' : 'Solana'} network</p>
                       </TooltipContent>
                     </Tooltip>
-                  </TooltipProvider>
-                  {track.blockchain && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Badge variant="secondary" className="text-xs capitalize">
-                            {track.blockchain}
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>This track is on the {track.blockchain === 'ethereum' ? 'Ethereum' : 'Solana'} network</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
                   )}
                 </div>
               </div>
@@ -291,19 +286,17 @@ export function TrackDetailPage() {
                   <p className="font-semibold text-sm sm:text-base">{track.bpm}</p>
                 </div>
               )}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="cursor-help">
-                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Royalty</p>
-                      <p className="font-semibold text-sm sm:text-base">{track.royaltyPercent}%</p>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Artist receives {track.royaltyPercent}% on every secondary sale</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="cursor-help">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Royalty</p>
+                    <p className="font-semibold text-sm sm:text-base">{track.royaltyPercent}%</p>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Artist receives {track.royaltyPercent}% on every secondary sale</p>
+                </TooltipContent>
+              </Tooltip>
               {track.releaseDate && (
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">Release Date</p>
