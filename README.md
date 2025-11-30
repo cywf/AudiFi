@@ -169,7 +169,37 @@ Mock data is stored in `localStorage` for demo purposes. In production, this wou
 - **Icons:** Phosphor Icons
 - **Notifications:** Sonner
 - **Build Tool:** Vite
-- **Deployment:** Vercel
+
+## 🚀 Deployment
+
+### Production & Preview (Vercel)
+
+The production frontend is deployed on **Vercel** via Git integration:
+
+- **Production:** Deploys automatically from the `main` branch to [audifi.io](https://audifi.io)
+- **Previews:** Each pull request gets an automatic preview deployment on Vercel
+
+Vercel handles all production and preview deployments directly from the repository. No GitHub Actions workflow deploys to Vercel.
+
+### Demo Site (GitHub Pages)
+
+A read-only demo build is deployed from the `demo` branch to **GitHub Pages**:
+
+- **Demo URL:** Available at the repository's GitHub Pages URL
+- **Trigger:** Push to the `demo` branch only
+- **Purpose:** Showcase the frontend without Vercel infrastructure
+
+To update the demo site, merge changes into the `demo` branch.
+
+### CI Checks
+
+The GitHub Actions workflow (`.github/workflows/frontend.yml`) runs on all PRs and pushes:
+
+- ESLint linting
+- TypeScript build
+- Production build verification
+
+CI must pass before merging PRs.
 
 ## 🔮 Future Integration Points
 
