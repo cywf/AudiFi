@@ -369,8 +369,10 @@ if (connectionString) {
   
   db = drizzle(sql, { schema });
   
+  // Note: postgres.js uses lazy connection - actual DB connection happens on first query
+  // Use isDatabaseReady() to verify connectivity after initialization
   if (!envConfig.isTest) {
-    console.log('✅ Database client initialized (Neon PostgreSQL)');
+    console.log('✅ Database client configured (Neon PostgreSQL)');
   }
 } else if (!envConfig.isTest) {
   console.warn(`⚠️  DATABASE_URL not set. Database features will be disabled.

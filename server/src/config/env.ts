@@ -73,7 +73,9 @@ export const envConfig = {
   dbUrl: getDatabaseUrl(),
 
   /**
-   * Server port. Defaults to 8080 for Fly.io compatibility.
+   * Server port.
+   * - Development: Use PORT env var or defaults in index.ts config (3001)
+   * - Production: Fly.io sets PORT=8080 automatically
    */
   port: parseInt(process.env.PORT ?? '8080', 10),
 

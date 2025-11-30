@@ -53,7 +53,7 @@ if (!connectionString) {
 // Note: Connection is lazily established on first query
 const sql = connectionString
   ? postgres(connectionString, {
-      max: Number(process.env.DB_POOL_MAX) || 10,
+      max: Number(process.env.DB_POOL_MAX || process.env.AUDIFI_DB_POOL_MAX) || 10,
       idle_timeout: 20,
       connect_timeout: 10,
     })
