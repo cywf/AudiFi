@@ -11,15 +11,26 @@ import dividendRoutes from './dividends.js';
 import vStudioRoutes from './vStudio.js';
 import paymentRoutes from './payments.js';
 import analyticsRoutes from './analytics.js';
+import { isDatabaseReady } from '../db/index.js';
 
 const router = Router();
 
-// Health check endpoint
-router.get('/health', (_req, res) => {
-  res.json({
-    status: 'ok',
+// Health check endpoint with dependency checks
+router.get('/health', async (_req, res) => {
+  const dbHealthy = await isDatabaseReady();
+  
+  const status = dbHealthy ? 'ok' : 'degraded';
+  const httpStatus = dbHealthy ? 200 : 503;
+  
+  res.status(httpStatus).json({
+    status,
     timestamp: new Date().toISOString(),
     version: '0.1.0',
+    dependencies: {
+      database: dbHealthy ? 'connected' : 'disconnected',
+      // Add more dependency checks as needed
+      // redis: await isRedisReady() ? 'connected' : 'disconnected',
+    },
   });
 });
 

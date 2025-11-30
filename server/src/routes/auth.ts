@@ -616,7 +616,7 @@ router.post('/logout', authenticate, async (req: AuthenticatedRequest, res) => {
 router.get('/me', authenticate, async (req: AuthenticatedRequest, res) => {
   try {
     const userId = req.user!.id;
-    const user = authService.findUserById(userId);
+    const user = await authService.getUserById(userId);
     
     if (!user) {
       res.status(404).json({

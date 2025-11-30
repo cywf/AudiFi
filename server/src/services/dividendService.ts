@@ -139,7 +139,7 @@ export async function getDividendContractByMaster(masterId: string): Promise<Div
 /**
  * Get all Dividend Contracts for an artist
  */
-export async function getDividendContractsByArtist(artistId: string): Promise<DividendContract[]> {
+export async function getDividendContractsByArtist(_artistId: string): Promise<DividendContract[]> {
   // This would need to join with Masters to filter by artistId
   // For now, return all contracts (in production, implement proper query)
   return Array.from(dividendContracts.values());

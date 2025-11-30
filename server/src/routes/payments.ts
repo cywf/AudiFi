@@ -37,9 +37,10 @@ const updateSubscriptionSchema = z.object({
   planName: z.enum(['FREE', 'PRO', 'ENTERPRISE']),
 });
 
-const cancelSubscriptionSchema = z.object({
-  cancelImmediately: z.boolean().optional(),
-});
+// Reserved for future use
+// const cancelSubscriptionSchema = z.object({
+//   cancelImmediately: z.boolean().optional(),
+// });
 
 const createWeb3SessionSchema = z.object({
   amount: z.string().min(1),
