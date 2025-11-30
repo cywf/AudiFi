@@ -100,6 +100,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'server/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Run database migrations
+        working-directory: server
+        run: npm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
+
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
@@ -146,6 +163,23 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'server/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Run database migrations
+        working-directory: server
+        run: npm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}
 
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
