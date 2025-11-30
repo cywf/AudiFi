@@ -52,7 +52,9 @@ const MAGIC_LINK_EXPIRY_MINUTES = config_settings.auth.magicLink.expiryMinutes;
 const REFRESH_TOKEN_EXPIRY_DAYS = 30;
 
 // Encryption key derivation from JWT_SECRET for TOTP secrets
-const ENCRYPTION_KEY = scryptSync(JWT_SECRET, 'audifi-totp-salt', 32);
+// The salt adds additional entropy. In production, ensure JWT_SECRET is unique per environment.
+const TOTP_ENCRYPTION_SALT = config_settings.auth.magicLink.secret || 'audifi-totp-default-salt';
+const ENCRYPTION_KEY = scryptSync(JWT_SECRET, TOTP_ENCRYPTION_SALT, 32);
 const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
 
 // =============================================================================
@@ -178,9 +180,19 @@ export async function requestMagicLink(email: string): Promise<{ success: boolea
     });
   }
 
-  // TODO: Send email with magic link using SendGrid
-  // For development debugging, the token is only accessible via database
-  // To test: query the magic_link_tokens table directly
+  // TODO(PRODUCTION): Implement SendGrid email sending
+  // Required: Set SENDGRID_API_KEY and EMAIL_FROM in environment
+  // Example implementation:
+  //   import sgMail from '@sendgrid/mail';
+  //   sgMail.setApiKey(config_settings.email.sendgridApiKey);
+  //   await sgMail.send({
+  //     to: email,
+  //     from: config_settings.email.from,
+  //     subject: 'Sign in to AudiFi',
+  //     html: `<a href="${config_settings.server.baseUrl}/auth/verify?token=${token}">Sign in</a>`
+  //   });
+  //
+  // For development debugging, query the magic_link_tokens table directly
   if (config_settings.isDevelopment) {
     console.log(`[Auth] Magic link requested for ${email} (expires in ${MAGIC_LINK_EXPIRY_MINUTES} minutes)`);
   }
