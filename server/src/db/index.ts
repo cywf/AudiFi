@@ -364,7 +364,12 @@ if (connectionString) {
   
   db = drizzle(sql, { schema });
 } else if (!config_settings.isTest) {
-  console.warn('⚠️  DATABASE_URL not set. Database client will not function.');
+  console.warn(`⚠️  DATABASE_URL not set. Database features will be disabled.
+  To configure the database:
+  1. Copy server/.env.example to server/.env
+  2. Set DATABASE_URL=postgresql://user:password@localhost:5432/audifi
+  3. Run 'npm run db:push' to create tables
+  See README.md for full setup instructions.`);
 }
 
 // Export db client - may be null if no connection string

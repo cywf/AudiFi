@@ -1,274 +1,228 @@
-# NFT Tracks
+# AudiFi (NFT Tracks)
 
-**NFT Tracks** is a platform for independent music artists to mint their tracks as one-of-one NFTs, retain full ownership, and earn perpetual royalties on every resale. Dream it. Mint it. Get paid forever.
+**AudiFi** is a Web3 platform for independent music artists to mint their tracks as NFTs, retain full ownership, and earn perpetual royalties through the innovative "Mover Advantage" system.
 
 ## 🎵 Overview
 
-NFT Tracks empowers artists to:
+AudiFi empowers artists to:
 - Upload music tracks and artwork
 - Configure release metadata (genre, BPM, mood, description)
-- Mint tracks as NFTs stored on IPFS
-- List NFTs for sale
+- Mint tracks as NFTs with fractional ownership (Master IPO)
 - Earn automatic royalties on all secondary market resales
+- Engage fans through V Studio interactive sessions
 
-This is the **frontend application** built with React + TypeScript, featuring mock APIs and integration placeholders for future Web3 and payment infrastructure.
+This repository contains:
+- **Frontend:** React + TypeScript SPA in `/src`
+- **Backend:** Node.js/Express API in `/server`
+- **Database:** Drizzle ORM schemas in `/db`
+- **Infrastructure:** Docker/Kubernetes configs in `/deploy`
 
 ## 🚀 Quick Start
 
-### Installation
+### Prerequisites
+
+- Node.js 20+
+- PostgreSQL 16+
+- Docker (optional, for containerized deployment)
+
+### Frontend Setup
 
 ```bash
 npm install
-```
-
-### Development
-
-```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173` (or the port shown in your terminal).
+The app will be available at `http://localhost:5173`.
 
-### Build for Production
+### Backend Setup
 
 ```bash
-npm run build
+cd server
+npm install
+npm run dev
+```
+
+The API will be available at `http://localhost:3001`.
+
+### Environment Variables
+
+Copy the example env files and configure:
+
+```bash
+# Root (frontend)
+cp .env.example .env
+
+# Server (backend)
+cp server/.env.example server/.env
+```
+
+Required backend environment variables:
+- `DATABASE_URL` - PostgreSQL connection string
+- `JWT_SECRET` - Secret for JWT token signing (min 32 chars)
+- `SENDGRID_API_KEY` - For magic link emails (optional in development)
+
+### Database Setup
+
+```bash
+cd server
+
+# Generate migrations from schema
+npm run db:generate
+
+# Apply migrations to database
+npm run db:migrate
+
+# Or push schema directly (development)
+npm run db:push
 ```
 
 ## 📁 Project Structure
 
 ```
-src/
-├── api/                    # Mock API layer
-│   ├── user.ts            # User data operations
-│   ├── tracks.ts          # Track CRUD operations
-│   ├── subscription.ts    # Subscription/pricing data
-│   └── marketplace.ts     # Marketplace listings and purchases
-├── components/
-│   ├── layout/            # Layout components
-│   │   ├── MainLayout.tsx # Main app layout with nav
-│   │   └── NavBar.tsx     # Landing page navigation
-│   ├── dashboard/         # Dashboard-specific components
-│   │   └── StatCard.tsx   # Stats display with earnings variant
-│   ├── tracks/            # Track-related components
-│   │   ├── TrackCard.tsx
-│   │   ├── MarketplaceTrackCard.tsx
-│   │   ├── MarketplaceFilters.tsx
-│   │   └── PurchaseModal.tsx
-│   ├── pricing/           # Pricing components
-│   │   └── PricingTierCard.tsx
-│   ├── wizard/            # Wizard/form components
-│   │   └── StepIndicator.tsx
-│   ├── profile/           # Profile components
-│   │   ├── SocialMediaLinks.tsx
-│   │   ├── MusicPlatformLinks.tsx
-│   │   └── TwoFactorSetup.tsx
-│   └── ui/                # shadcn UI components
-├── constants/             # App constants
-│   └── index.ts           # Genres, mood tags, config
-├── lib/                   # Integration stubs and utilities
-│   ├── wallet.ts          # MetaMask wallet stub
-│   ├── payments.ts        # Stripe payment stub
-│   └── utils.ts           # Utility functions (cn, etc.)
-├── pages/                 # Route pages
-│   ├── LandingPage.tsx    # Home page with hero
-│   ├── DashboardPage.tsx  # Artist dashboard
-│   ├── CreateTrackPage.tsx # Multi-step track creation wizard
-│   ├── TrackDetailPage.tsx # Individual track view
-│   ├── PricingPage.tsx    # Subscription tiers
-│   ├── SettingsPage.tsx   # Account settings
-│   ├── ProfilePage.tsx    # Artist profile management
-│   ├── SignupPage.tsx     # Account creation
-│   ├── HowItWorksPage.tsx # Educational page
-│   ├── WhyNFTTracksPage.tsx # Value proposition
-│   └── MarketplacePage.tsx # NFT marketplace
-├── types/                 # TypeScript type definitions
-│   └── index.ts
-├── App.tsx               # Root app with routing
-├── index.css             # CSS variables and base styles
-├── main.css              # Tailwind imports and theme mapping
-└── main.tsx              # App entry point
+├── src/                       # Frontend React application
+│   ├── api/                   # API client layer
+│   ├── components/            # React components
+│   ├── pages/                 # Route pages
+│   └── types/                 # TypeScript types
+├── server/                    # Backend Node.js/Express API
+│   ├── src/
+│   │   ├── config/            # Configuration
+│   │   ├── db/                # Database client & schema
+│   │   ├── middleware/        # Express middleware
+│   │   ├── routes/            # API routes
+│   │   └── services/          # Business logic
+│   ├── Dockerfile             # Backend container image
+│   └── drizzle.config.ts      # Drizzle Kit configuration
+├── db/                        # Shared database schemas
+│   └── schema/                # Drizzle ORM table definitions
+├── deploy/                    # Infrastructure configs
+│   ├── docker-compose.yml.example
+│   └── Caddyfile.example
+└── docs/                      # Documentation
+```
+
+## 🔐 Authentication
+
+AudiFi uses JWT-based authentication with magic link passwordless login:
+
+1. User requests magic link via email
+2. Token is stored in database with 15-minute expiry
+3. User clicks link, token is verified and consumed
+4. JWT access token (short-lived) + refresh token (30 days) issued
+5. Optional 2FA via TOTP (Google Authenticator compatible)
+
+### Wallet Linking
+
+Users can link Web3 wallets with signature verification:
+```
+POST /api/v1/auth/wallet
+{
+  "address": "0x...",
+  "chain": "ethereum",
+  "signature": "0x...",
+  "message": "Sign this message to link your wallet"
+}
 ```
 
 ## 🎯 Key Features
 
-### 1. Landing Page (`/`)
-- Hero section with value proposition
-- Feature showcase
-- Call-to-action buttons
+### Master IPO
+- Artists can create "Masters" (tracks/albums) and launch IPOs
+- Configurable supply (1 to 1,000,000 NFTs)
+- "Mover Advantage" system rewards early minters with perpetual royalties
 
-### 2. Dashboard (`/dashboard`)
-- Overview stats (total tracks, sales, royalties)
-- Track management grid
-- Quick access to create new tracks
+### V Studio
+- Interactive fan sessions during creative process
+- Decision points where fans vote on creative choices
+- Eligibility rules (NFT holders, coin holders, subscribers)
 
-### 3. Create Track Wizard (`/tracks/new`)
-Multi-step wizard with:
-- **Step 1:** Track details (title, genre, BPM, mood tags, description, audio upload)
-- **Step 2:** Artwork upload
-- **Step 3:** Economics (pricing, royalties, release date)
-- **Step 4:** Review and mint simulation
+### Multi-Chain Support
+- Ethereum, Polygon, Base networks supported
+- Chain selection per IPO
+- Wallet linking per chain
 
-### 4. Track Detail Page (`/tracks/:id`)
-- Complete track information
-- Artwork and waveform visualization
-- Ownership and IPFS hash display
-- Purchase simulation for visitors
+## 🧪 Development
 
-### 5. Pricing Page (`/pricing`)
-- Free vs Pro tier comparison
-- FAQ section
-- Simulated Stripe checkout
+### Running Tests
 
-### 6. Settings Page (`/settings`)
-- Profile information
-- Wallet connection (MetaMask stub)
-- Subscription management
+```bash
+# Frontend
+npm test
 
-### 7. Marketplace (`/marketplace`)
-- Browse and discover listed NFT tracks
-- Filter by genre, blockchain, and price
-- Multi-blockchain support (Ethereum/Solana simulation)
-- Purchase flow with wallet connection
-
-### 8. Profile Page (`/profile`)
-- Artist profile customization
-- Social media links
-- Music platform links
-- Two-factor authentication setup
-
-### 9. How It Works (`/how-it-works`)
-- Step-by-step guide to the minting process
-- Animated visual walkthrough
-- Benefits of the platform
-
-### 10. Why NFT Tracks (`/why-nft-tracks`)
-- Educational content about music industry challenges
-- Explanation of the 10% perpetual royalty model
-- Track-level ROI concept
-
-### 11. Signup (`/signup`)
-- Account creation flow
-- Terms acceptance
-- Profile initialization
-
-## 🎨 Design System
-
-### Colors (oklch)
-- **Primary:** Deep Purple (`oklch(0.45 0.18 300)`) - Creative/artistic brand color
-- **Secondary:** Dark Cyan (`oklch(0.55 0.12 200)`) - Technical/blockchain accent
-- **Accent:** Bright Cyan (`oklch(0.75 0.15 200)`) - Call-to-action and highlights
-- **Warning:** Warm Amber (`oklch(0.65 0.15 80)`) - Value/earnings displays
-- **Background:** Dark Slate (`oklch(0.15 0.02 260)`)
-
-### Typography
-- **Font:** Inter (Google Fonts)
-- **Scale:** 12px (caption) → 14px (body) → 18px (h3) → 24px (h2) → 36px (h1)
-
-### Components
-Built with **shadcn/ui v4** components, customized for the music/crypto aesthetic.
-
-## 🔌 Mock APIs & Integrations
-
-All data operations use mock APIs with simulated latency:
-
-### Mock APIs
-- `api/user.ts` - User profile management
-- `api/tracks.ts` - Track CRUD and minting simulation
-- `api/subscription.ts` - Pricing plans
-
-### Integration Stubs
-- `lib/wallet.ts` - MetaMask connection placeholder
-- `lib/payments.ts` - Stripe checkout placeholder
-
-### Data Persistence
-Mock data is stored in `localStorage` for demo purposes. In production, this would connect to a real backend with Web3 integration.
-
-## 🧪 Tech Stack
-
-- **Framework:** React 19 + TypeScript
-- **Routing:** React Router v7
-- **Styling:** Tailwind CSS v4
-- **UI Components:** shadcn/ui v4
-- **Icons:** Phosphor Icons
-- **Notifications:** Sonner
-- **Build Tool:** Vite
-
-## 📝 Type Definitions
-
-Key TypeScript interfaces:
-
-```typescript
-interface User {
-  id: string
-  name: string
-  email: string
-  walletAddress?: string
-  subscriptionPlan: "FREE" | "PRO"
-  createdAt: string
-}
-
-interface Track {
-  id: string
-  title: string
-  description: string
-  genre: string
-  bpm?: number
-  moodTags: string[]
-  audioFileName: string
-  coverImageUrl?: string
-  artistId: string
-  status: "DRAFT" | "MINTED" | "LISTED" | "SOLD"
-  ipfsHash?: string
-  ownerWalletAddress?: string
-  currentPrice?: number
-  currency?: "ETH" | "USD"
-  royaltyPercent: number
-  releaseDate?: string
-  allowSecondaryResale?: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-interface SubscriptionPlan {
-  id: string
-  name: string
-  pricePerMonthUSD: number
-  maxTracks: number | null
-  features: string[]
-}
+# Backend
+cd server
+npm test
 ```
 
-## 🔮 Future Integration Points
+### Type Checking
 
-This frontend is designed for easy integration with:
+```bash
+# Frontend
+npm run type-check
 
-1. **Web3 Backend**
-   - Replace `lib/wallet.ts` with actual MetaMask/WalletConnect integration
-   - Implement smart contract calls for minting and transfers
-   - Connect to real blockchain networks (Ethereum, Polygon, etc.)
+# Backend
+cd server
+npm run type-check
+```
 
-2. **IPFS Storage**
-   - Replace simulated file uploads with actual IPFS pinning services
-   - Store audio files and artwork on IPFS
-   - Generate and store metadata JSON on IPFS
+### Linting
 
-3. **Payment Processing**
-   - Replace `lib/payments.ts` with actual Stripe integration
-   - Implement webhook handlers for subscription events
-   - Support both crypto and fiat payments
+```bash
+# Frontend
+npm run lint
 
-4. **Backend API**
-   - Replace mock APIs with real REST/GraphQL endpoints
-   - Implement authentication and authorization
-   - Add database persistence (PostgreSQL, MongoDB, etc.)
+# Backend
+cd server
+npm run lint
+```
 
-## 🎭 Demo Data
+## 🐳 Docker Deployment
 
-The app includes sample tracks with realistic metadata:
-- "Midnight Pulse" (Deep House, Minted)
-- "Neon Dreams" (Synthwave, Listed)
-- "Untitled Project" (Experimental, Draft)
+```bash
+# Build and run with docker-compose
+cp deploy/docker-compose.yml.example deploy/docker-compose.yml
+cp deploy/.env.example deploy/.env
+# Edit deploy/.env with your configuration
+
+cd deploy
+docker-compose up -d
+```
+
+## 📝 API Documentation
+
+See [docs/api/overview.md](docs/api/overview.md) for full API reference.
+
+### Key Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/health` | GET | Health check with dependency status |
+| `/api/v1/auth/magic-link` | POST | Request magic link |
+| `/api/v1/auth/verify-magic-link` | POST | Verify and get tokens |
+| `/api/v1/auth/refresh` | POST | Refresh access token |
+| `/api/v1/masters` | GET/POST | List/create masters |
+| `/api/v1/masters/:id/ipo` | POST | Create IPO for master |
+
+## 🔮 Tech Stack
+
+### Frontend
+- React 19 + TypeScript
+- React Router v7
+- Tailwind CSS v4
+- shadcn/ui components
+
+### Backend
+- Node.js 20 + TypeScript
+- Express.js
+- Drizzle ORM + PostgreSQL
+- JWT authentication
+- ethers.js for Web3
+
+### Infrastructure
+- Docker containers
+- Caddy reverse proxy
+- PostgreSQL 16
+- Redis (for caching/sessions)
 
 ## 📄 License
 

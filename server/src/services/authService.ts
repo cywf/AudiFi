@@ -17,7 +17,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { randomBytes } from 'crypto';
+import { randomBytes, createCipheriv, createDecipheriv, scryptSync } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { authenticator } from 'otplib';
 import { ethers } from 'ethers';
@@ -50,6 +50,48 @@ const JWT_SECRET = config_settings.auth.jwt.secret;
 const JWT_EXPIRES_IN = config_settings.auth.jwt.expiresIn;
 const MAGIC_LINK_EXPIRY_MINUTES = config_settings.auth.magicLink.expiryMinutes;
 const REFRESH_TOKEN_EXPIRY_DAYS = 30;
+
+// Encryption key derivation from JWT_SECRET for TOTP secrets
+const ENCRYPTION_KEY = scryptSync(JWT_SECRET, 'audifi-totp-salt', 32);
+const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
+
+// =============================================================================
+// TOTP SECRET ENCRYPTION
+// =============================================================================
+
+/**
+ * Encrypt a TOTP secret before storing in database
+ */
+function encryptTotpSecret(secret: string): string {
+  const iv = randomBytes(16);
+  const cipher = createCipheriv(ENCRYPTION_ALGORITHM, ENCRYPTION_KEY, iv);
+  
+  let encrypted = cipher.update(secret, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  
+  const authTag = cipher.getAuthTag();
+  
+  // Format: iv:authTag:encryptedData
+  return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
+}
+
+/**
+ * Decrypt a TOTP secret retrieved from database
+ */
+function decryptTotpSecret(encryptedData: string): string {
+  const [ivHex, authTagHex, encrypted] = encryptedData.split(':');
+  
+  const iv = Buffer.from(ivHex, 'hex');
+  const authTag = Buffer.from(authTagHex, 'hex');
+  
+  const decipher = createDecipheriv(ENCRYPTION_ALGORITHM, ENCRYPTION_KEY, iv);
+  decipher.setAuthTag(authTag);
+  
+  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  
+  return decrypted;
+}
 
 // =============================================================================
 // JWT TOKEN MANAGEMENT
@@ -137,10 +179,10 @@ export async function requestMagicLink(email: string): Promise<{ success: boolea
   }
 
   // TODO: Send email with magic link using SendGrid
-  // In development, log the token for testing
+  // For development debugging, the token is only accessible via database
+  // To test: query the magic_link_tokens table directly
   if (config_settings.isDevelopment) {
-    console.log(`[Auth] Magic link token for ${email}: ${token}`);
-    console.log(`[Auth] Magic link URL: ${config_settings.server.baseUrl}/auth/verify?token=${token}`);
+    console.log(`[Auth] Magic link requested for ${email} (expires in ${MAGIC_LINK_EXPIRY_MINUTES} minutes)`);
   }
 
   return {
@@ -379,10 +421,11 @@ export async function setupTOTP(userId: string): Promise<{
 
   // Store the secret (encrypted) in the database
   if (db) {
-    // TODO: Encrypt the secret before storing
+    // Encrypt the TOTP secret before storing
+    const encryptedSecret = encryptTotpSecret(secret);
     await db
       .update(users)
-      .set({ twoFactorSecret: secret })
+      .set({ twoFactorSecret: encryptedSecret })
       .where(eq(users.id, userId));
   }
 
@@ -412,8 +455,15 @@ export async function verifyTOTP(userId: string, code: string): Promise<boolean>
     return false;
   }
 
-  // Verify the TOTP code
-  return authenticator.verify({ token: code, secret: user.twoFactorSecret });
+  try {
+    // Decrypt the stored TOTP secret
+    const decryptedSecret = decryptTotpSecret(user.twoFactorSecret);
+    // Verify the TOTP code
+    return authenticator.verify({ token: code, secret: decryptedSecret });
+  } catch (error) {
+    console.error('[Auth] Failed to verify TOTP:', error);
+    return false;
+  }
 }
 
 /**
@@ -828,27 +878,8 @@ export async function updateUser(
 }
 
 // =============================================================================
-// LEGACY API (for backwards compatibility during migration)
+// USER LOOKUP FUNCTIONS
 // =============================================================================
-
-/**
- * Find a user by email (legacy API)
- */
-export function findUserByEmail(_email: string): User | undefined {
-  // This is now async, but we keep it for backwards compatibility
-  // Callers should migrate to use async version
-  console.warn('[Auth] findUserByEmail is deprecated, use async findUserByEmailFromDb');
-  return undefined;
-}
-
-/**
- * Find a user by ID (legacy API)
- */
-export function findUserById(_id: string): User | undefined {
-  // This is now async, but we keep it for backwards compatibility
-  console.warn('[Auth] findUserById is deprecated, use async findUserByIdFromDb');
-  return undefined;
-}
 
 /**
  * Find a user by wallet address
