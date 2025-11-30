@@ -1,6 +1,10 @@
 # =============================================================================
 # AudiFi Backend API Dockerfile
 # Multi-stage build for production-optimized Node.js backend
+#
+# Compatible with:
+# - Fly.io (primary production deployment)
+# - Local Docker/Docker Compose development
 # =============================================================================
 
 # Stage 1: Build
@@ -14,6 +18,7 @@ RUN npm ci --only=production=false
 
 # Copy source code
 COPY tsconfig.json ./
+COPY drizzle.config.ts ./
 COPY src ./src
 
 # Build TypeScript
@@ -34,6 +39,7 @@ RUN npm ci --only=production && npm cache clean --force
 
 # Copy built artifacts from builder stage
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/drizzle.config.ts ./
 
 # Change ownership to non-root user
 RUN chown -R audifi:audifi /app
@@ -41,16 +47,16 @@ RUN chown -R audifi:audifi /app
 # Switch to non-root user
 USER audifi
 
-# Expose port
-EXPOSE 3001
+# Expose port (default 8080 for Fly.io, configurable via PORT env)
+EXPOSE 8080
 
-# Health check
+# Health check (works with both /api/v1/health and default port)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/v1/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/v1/health || exit 1
 
-# Set environment variables
+# Set default environment variables
 ENV NODE_ENV=production
-ENV PORT=3001
+ENV PORT=8080
 
 # Start the server
 CMD ["node", "dist/index.js"]

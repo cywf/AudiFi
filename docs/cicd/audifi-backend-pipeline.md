@@ -2,7 +2,7 @@
 
 ## Overview
 
-The backend pipeline handles continuous integration and deployment for the AudiFi backend services to the Ubuntu 24.04 server. These services power:
+The backend pipeline handles continuous integration and deployment for the AudiFi backend services to **Fly.io**. These services power:
 
 - **Master IPO / Master Contract / Dividend Contract APIs** - NFT and revenue distribution
 - **V Studio Session & Real-time Services** - Live collaboration features
@@ -15,9 +15,14 @@ The backend pipeline handles continuous integration and deployment for the AudiF
 .github/workflows/backend.yml
 ```
 
-## Current Status
+## Deployment Target
 
-⚠️ **Note:** This workflow is a template. The backend codebase is not yet present in the repository. When backend services are added to the `backend/`, `api/`, or `server/` directories, this workflow will be activated automatically.
+The backend is deployed to **Fly.io** (not SSH + Docker Compose on VMs):
+
+| Environment | Fly.io App | URL |
+|-------------|-----------|-----|
+| Staging | `audifi-api-staging` | https://audifi-api-staging.fly.dev |
+| Production | `audifi-api` | https://audifi-api.fly.dev |
 
 ## Trigger Conditions
 
@@ -25,12 +30,8 @@ The backend pipeline runs when changes are detected in:
 
 | Path Pattern | Description |
 |--------------|-------------|
-| `backend/**` | Backend source code |
-| `api/**` | API service code |
-| `server/**` | Server code |
-| `services/**` | Microservices |
-| `Dockerfile*` | Container definitions |
-| `docker-compose*.yml` | Container orchestration |
+| `server/**` | Backend source code |
+| `.github/workflows/backend.yml` | Pipeline configuration |
 
 ## Pipeline Jobs
 
@@ -41,323 +42,245 @@ The backend pipeline runs when changes are detected in:
 **Steps:**
 1. Checkout repository
 2. Setup Node.js v20
-3. Install dependencies
-4. Run linting
-5. Run tests
+3. Install dependencies (`npm ci`)
+4. Run linting (`npm run lint`)
+5. Run type check (`npm run type-check`)
+6. Run tests (`npm test`)
+7. Build (`npm run build`)
 
-**Notes:**
-- Automatically detects backend directory location
-- Gracefully handles missing lint/test scripts
-
-### 2. Docker Build
-
-**Runs on:** After successful build & test
-
-**Steps:**
-1. Check for Dockerfile existence
-2. Set up Docker Buildx
-3. Log in to GitHub Container Registry (GHCR)
-4. Extract metadata and generate tags
-5. Build and push Docker image
-
-**Image Tags:**
-- `sha-<commit>` - Commit-specific tag
-- `develop` / `main` - Branch tags
-- `latest` - For main branch
-- `pr-<number>` - For pull requests
-
-### 3. Deploy Staging
+### 2. Deploy Staging (Fly.io)
 
 **Runs on:** Push to `develop` branch
 
 **Environment:** `staging`
 
-**Target:** Ubuntu 24.04 server at `api-staging.audifi.io`
+**Target:** Fly.io app `audifi-api-staging`
 
 **Steps:**
-1. SSH to staging server
-2. Pull latest Docker images
-3. Run database migrations (if configured)
-4. Restart services with docker-compose
-5. Health check
-6. Cleanup old images
+1. Setup Flyctl CLI
+2. Deploy to Fly.io staging app
+3. Migrations run automatically via `release_command`
 
-### 4. Deploy Production
+### 3. Deploy Production (Fly.io)
 
 **Runs on:** Push to `main` branch
 
 **Environment:** `production`
 
-**Target:** Ubuntu 24.04 server at `api.audifi.io`
+**Target:** Fly.io app `audifi-api`
 
 **Steps:**
-1. SSH to production server
-2. Pull latest Docker images
-3. Run database migrations (if configured)
-4. Rolling update with zero-downtime
-5. Health check
-6. Cleanup old images
+1. Setup Flyctl CLI
+2. Deploy to Fly.io production app
+3. Migrations run automatically via `release_command`
 
-## Server Requirements
+## Fly.io Configuration
 
-### Ubuntu 24.04 Server Setup
+### fly.toml
 
-The deployment server must have:
+The Fly.io configuration is in `server/fly.toml`:
 
-```bash
-# Required software
-- Docker Engine (24.0+)
-- Docker Compose v2 (2.20+)
-- curl (for health checks)
+```toml
+app = "audifi-api"
+primary_region = "iad"
 
-# Directory structure
-/opt/audifi/
-├── staging/
-│   ├── docker-compose.yml
-│   ├── .env
-│   └── data/
-└── production/
-    ├── docker-compose.yml
-    ├── .env
-    └── data/
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  NODE_ENV = "production"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    path = "/api/v1/health"
+    interval = "30s"
+    timeout = "10s"
+
+[deploy]
+  release_command = "npm run db:migrate"
 ```
 
-### Server Installation
+### Database Migrations
 
-```bash
-# Install Docker
-curl -fsSL https://get.docker.com | sudo sh
-sudo usermod -aG docker deploy
+Migrations run automatically before each deployment via the `release_command` in `fly.toml`. This ensures:
 
-# Create directories
-sudo mkdir -p /opt/audifi/{staging,production}/data
-sudo chown -R deploy:deploy /opt/audifi
-```
+- Migrations complete before the new app version starts
+- Safe, idempotent migration execution
+- Automatic rollback if migrations fail
 
 ## Required Secrets
 
 Configure these secrets in GitHub repository settings:
 
-### Container Registry
+### Fly.io Deployment
 
-| Secret Name | Description |
-|-------------|-------------|
-| `GITHUB_TOKEN` | Automatically provided for GHCR |
+| Secret Name | Description | How to Get |
+|-------------|-------------|-----------|
+| `FLY_API_TOKEN` | Fly.io deploy token | `flyctl tokens create deploy` |
+| `FLY_APP_STAGING` | Staging app name (optional) | Defaults to `audifi-api-staging` |
+| `FLY_APP_PRODUCTION` | Production app name (optional) | Defaults to `audifi-api` |
 
-### SSH Deployment
+### Fly.io App Secrets
 
-| Secret Name | Description |
-|-------------|-------------|
-| `DEPLOY_USER` | SSH username for server access |
-| `DEPLOY_SSH_KEY` | SSH private key for authentication |
-| `STAGING_HOST` | Staging server hostname/IP |
-| `PRODUCTION_HOST` | Production server hostname/IP |
-
-### Generating SSH Keys
+Set these directly in Fly.io (not in GitHub):
 
 ```bash
-# Generate deployment key
-ssh-keygen -t ed25519 -C "audifi-deploy" -f audifi-deploy
+flyctl secrets set JWT_SECRET="your-jwt-secret-min-32-chars" --app audifi-api
+flyctl secrets set MAGIC_LINK_SECRET="your-magic-link-secret" --app audifi-api
+flyctl secrets set SENDGRID_API_KEY="your-sendgrid-key" --app audifi-api
+# DATABASE_URL is set automatically when attaching Fly Postgres
+```
 
-# Add public key to server
-ssh-copy-id -i audifi-deploy.pub deploy@staging.audifi.io
-ssh-copy-id -i audifi-deploy.pub deploy@production.audifi.io
+## Initial Setup
 
-# Add private key to GitHub Secrets as DEPLOY_SSH_KEY
-cat audifi-deploy
+### 1. Create Fly.io Apps
+
+```bash
+# Production
+cd server
+flyctl apps create audifi-api
+
+# Staging
+flyctl apps create audifi-api-staging
+```
+
+### 2. Create Fly Postgres
+
+```bash
+# Create database cluster
+flyctl postgres create --name audifi-db
+
+# Attach to production app
+flyctl postgres attach audifi-db --app audifi-api
+
+# Attach to staging app
+flyctl postgres attach audifi-db --app audifi-api-staging
+```
+
+### 3. Set Secrets
+
+```bash
+# Production
+flyctl secrets set JWT_SECRET="..." --app audifi-api
+flyctl secrets set MAGIC_LINK_SECRET="..." --app audifi-api
+
+# Staging
+flyctl secrets set JWT_SECRET="..." --app audifi-api-staging
+flyctl secrets set MAGIC_LINK_SECRET="..." --app audifi-api-staging
+```
+
+### 4. Create GitHub Secret
+
+```bash
+# Generate deploy token
+flyctl tokens create deploy
+
+# Add to GitHub as FLY_API_TOKEN
 ```
 
 ## Deployment Architecture
 
-### Container Layout
-
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   Ubuntu 24.04 Server                    │
+│                        Fly.io                           │
 ├─────────────────────────────────────────────────────────┤
 │                                                          │
-│  ┌─────────────────┐     ┌─────────────────┐            │
-│  │   API Service   │     │  Session Service │            │
-│  │   (Node.js)     │     │  (WebSocket)     │            │
-│  │   Port: 3000    │     │   Port: 3001     │            │
-│  └────────┬────────┘     └────────┬─────────┘            │
-│           │                       │                       │
-│           └───────────┬───────────┘                       │
-│                       │                                   │
-│  ┌────────────────────┴────────────────────┐             │
-│  │           Reverse Proxy (Nginx)          │             │
-│  │          Ports: 80, 443 (SSL)            │             │
-│  └──────────────────────────────────────────┘             │
-│                                                          │
-│  ┌─────────────────┐     ┌─────────────────┐            │
-│  │   PostgreSQL    │     │     Redis       │            │
-│  │   Port: 5432    │     │   Port: 6379    │            │
-│  └─────────────────┘     └─────────────────┘            │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │              Fly Proxy (anycast)                 │    │
+│  │           https://audifi-api.fly.dev             │    │
+│  └─────────────────────────────────────────────────┘    │
+│                         │                                │
+│                         ▼                                │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │           AudiFi Backend (Node.js)              │    │
+│  │              Internal Port: 8080                 │    │
+│  │                                                  │    │
+│  │  - Express.js API                               │    │
+│  │  - JWT Auth                                     │    │
+│  │  - Drizzle ORM                                  │    │
+│  └─────────────────────────────────────────────────┘    │
+│                         │                                │
+│                         ▼                                │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │              Fly Postgres                        │    │
+│  │          PostgreSQL 16 (managed)                 │    │
+│  └─────────────────────────────────────────────────┘    │
 │                                                          │
 └─────────────────────────────────────────────────────────┘
 ```
-
-### Docker Compose Template
-
-```yaml
-# /opt/audifi/production/docker-compose.yml
-
-version: '3.8'
-
-services:
-  api:
-    image: ghcr.io/cywf/audifi:latest
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    depends_on:
-      - postgres
-      - redis
-
-  session:
-    image: ghcr.io/cywf/audifi-session:latest
-    restart: unless-stopped
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=production
-      - REDIS_URL=${REDIS_URL}
-    depends_on:
-      - redis
-
-  postgres:
-    image: postgres:16
-    restart: unless-stopped
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=audifi
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    volumes:
-      - ./data/redis:/data
-
-networks:
-  default:
-    name: audifi
-```
-
-## Graceful Restart Strategy
-
-### Handling V Studio Sessions
-
-For zero-downtime deployments that preserve in-flight V Studio sessions:
-
-```bash
-# Rolling update strategy (in production deploy script)
-
-# 1. Scale up new instances
-docker compose up -d --scale api=2
-
-# 2. Wait for new instances to be healthy
-sleep 15
-
-# 3. Scale back down (old instances terminate)
-docker compose up -d --scale api=1
-```
-
-### Session Persistence
-
-- WebSocket sessions should be backed by Redis
-- Session state survives container restarts
-- Clients auto-reconnect on connection loss
 
 ## Health Checks
 
 ### API Health Endpoint
 
-Expected endpoint: `GET /health`
+Expected endpoint: `GET /api/v1/health`
 
 Response:
 ```json
 {
-  "status": "healthy",
+  "status": "ok",
   "timestamp": "2025-11-29T00:00:00Z",
-  "services": {
-    "database": "connected",
-    "redis": "connected",
-    "blockchain": "connected"
+  "version": "0.1.0",
+  "dependencies": {
+    "database": "connected"
   }
 }
 ```
 
-### Deployment Health Check
+Fly.io performs health checks every 30 seconds to this endpoint.
+
+## Monitoring
+
+### View Logs
 
 ```bash
-# In deployment script
-curl -f http://localhost:3000/health || exit 1
+# Live logs
+flyctl logs --app audifi-api
+
+# Recent logs
+flyctl logs --app audifi-api -n 100
+```
+
+### Check Status
+
+```bash
+flyctl status --app audifi-api
+```
+
+### SSH Access
+
+```bash
+flyctl ssh console --app audifi-api
 ```
 
 ## Rollback Procedure
 
-### Automatic Rollback
-
-If health check fails, previous deployment remains active.
-
-### Manual Rollback
+### Using Fly.io Releases
 
 ```bash
-# SSH to server
-ssh deploy@api.audifi.io
+# List recent releases
+flyctl releases --app audifi-api
 
-# Navigate to deployment directory
-cd /opt/audifi/production
-
-# Rollback to previous image tag
-docker compose down
-docker compose pull ghcr.io/cywf/audifi:<previous-sha>
-docker compose up -d
+# Rollback to previous release
+flyctl deploy --image registry.fly.io/audifi-api:v123 --app audifi-api
 ```
 
-### Using Git SHA Tags
+### Manual Redeploy
 
 ```bash
-# Find previous working deployment
-docker images ghcr.io/cywf/audifi --format "{{.Tag}}"
+# Checkout previous commit
+git checkout <previous-sha>
 
-# Deploy specific version
-docker compose pull ghcr.io/cywf/audifi:abc123
-docker compose up -d
-```
-
-## Monitoring
-
-### Container Logs
-
-```bash
-# View API logs
-docker compose logs -f api
-
-# View all service logs
-docker compose logs -f
-```
-
-### Resource Usage
-
-```bash
-# Container stats
-docker stats
-
-# Disk usage
-docker system df
+# Deploy
+cd server
+flyctl deploy --app audifi-api
 ```
 
 ## Troubleshooting
@@ -366,25 +289,28 @@ docker system df
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
-| SSH connection failed | Key not authorized | Verify `DEPLOY_SSH_KEY` secret |
-| Health check failed | App not starting | Check container logs |
-| Image pull failed | Auth issues | Verify GHCR access |
-| Port already in use | Previous container | Run `docker compose down` |
+| Deploy failed | Build error | Check `flyctl logs` |
+| Health check failed | App crash | Check container logs |
+| Migration failed | DB error | SSH and run manually |
+| 502 Bad Gateway | App not ready | Wait for health check |
 
 ### Debug Commands
 
 ```bash
-# Check running containers
-docker ps
+# Check app status
+flyctl status --app audifi-api
 
-# Check container logs
-docker logs <container-id>
+# View recent logs
+flyctl logs --app audifi-api
 
-# Check docker-compose config
-docker compose config
+# SSH into container
+flyctl ssh console --app audifi-api
 
-# Test health endpoint
-curl -v http://localhost:3000/health
+# Check secrets
+flyctl secrets list --app audifi-api
+
+# Check database connection
+flyctl postgres connect --app audifi-db
 ```
 
 ---

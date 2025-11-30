@@ -2,18 +2,146 @@
 
 This directory contains deployment configuration files for the AudiFi platform.
 
-## Contents
+## Architecture Overview
+
+```
+Internet
+    │
+    ├─▶ Vercel (audifi.io, app.audifi.io)
+    │       └── Frontend (React + Vite)
+    │
+    └─▶ Fly.io (audifi-api.fly.dev)
+            │
+            ├── Backend API Server
+            │       └── Express.js on Node.js
+            │
+            └── Fly Postgres
+                    └── PostgreSQL 16
+```
+
+### Primary Deployment
+
+| Component | Platform | URL |
+|-----------|----------|-----|
+| Frontend | Vercel | `audifi.io`, `app.audifi.io` |
+| Backend API | Fly.io | `audifi-api.fly.dev` |
+| Database | Fly Postgres | Internal connection |
+
+### Staging Environment
+
+| Component | Platform | URL |
+|-----------|----------|-----|
+| Frontend | Vercel Preview | `*.vercel.app` |
+| Backend API | Fly.io | `audifi-api-staging.fly.dev` |
+| Database | Fly Postgres | Internal connection |
+
+## Fly.io Deployment (Production)
+
+The backend API is deployed to Fly.io. Configuration is in `server/fly.toml`.
+
+### Prerequisites
+
+1. Install Flyctl CLI:
+   ```bash
+   curl -L https://fly.io/install.sh | sh
+   ```
+
+2. Authenticate with Fly.io:
+   ```bash
+   flyctl auth login
+   ```
+
+### Initial Setup
+
+1. **Create Fly.io App** (first time only):
+   ```bash
+   cd server
+   flyctl apps create audifi-api
+   ```
+
+2. **Create Fly Postgres Database**:
+   ```bash
+   flyctl postgres create --name audifi-db
+   flyctl postgres attach audifi-db --app audifi-api
+   ```
+   This automatically sets the `DATABASE_URL` secret.
+
+3. **Set Required Secrets**:
+   ```bash
+   flyctl secrets set JWT_SECRET="your-production-jwt-secret-min-32-chars" --app audifi-api
+   flyctl secrets set MAGIC_LINK_SECRET="your-magic-link-secret" --app audifi-api
+   flyctl secrets set SENDGRID_API_KEY="your-sendgrid-key" --app audifi-api
+   # Add other required secrets
+   ```
+
+4. **Deploy**:
+   ```bash
+   flyctl deploy --app audifi-api
+   ```
+
+### CI/CD Deployment
+
+Deployment is automated via GitHub Actions (`.github/workflows/backend.yml`):
+
+- **Staging**: Push to `develop` branch → deploys to `audifi-api-staging`
+- **Production**: Push to `main` branch → deploys to `audifi-api`
+
+Required GitHub Secrets:
+- `FLY_API_TOKEN` - Fly.io API token (create with `flyctl tokens create deploy`)
+- `FLY_APP_STAGING` - Staging app name (optional, defaults to `audifi-api-staging`)
+- `FLY_APP_PRODUCTION` - Production app name (optional, defaults to `audifi-api`)
+
+### Database Migrations
+
+Migrations run automatically during deployment via the `release_command` in `fly.toml`:
+```toml
+[deploy]
+  release_command = "npm run db:migrate"
+```
+
+For manual migrations:
+```bash
+flyctl ssh console --app audifi-api
+npm run db:migrate
+```
+
+### Monitoring
+
+```bash
+# View logs
+flyctl logs --app audifi-api
+
+# Check app status
+flyctl status --app audifi-api
+
+# SSH into container
+flyctl ssh console --app audifi-api
+```
+
+### Health Check
+
+```bash
+curl https://audifi-api.fly.dev/api/v1/health
+```
+
+---
+
+## Alternative: Self-Hosted Deployment (Docker Compose)
+
+For self-hosted deployments on a VPS or bare-metal server, use the Docker Compose configuration below. This is **not the primary deployment method** but is available for specific use cases.
+
+### Contents
 
 | File | Purpose |
 |------|---------|
-| `docker-compose.yml.example` | Local development and production-ready Docker Compose setup |
-| `Caddyfile.example` | Caddy reverse proxy configuration (recommended) |
+| `docker-compose.yml.example` | Local development and self-hosted setup |
+| `Caddyfile.example` | Caddy reverse proxy configuration |
 | `nginx.conf.example` | Nginx reverse proxy configuration (alternative) |
 | `.env.example` | Environment variable template |
 
-## Quick Start (Local Development)
+### Quick Start (Local Development)
 
-### 1. Copy Configuration Files
+#### 1. Copy Configuration Files
 
 ```bash
 cp docker-compose.yml.example docker-compose.yml
@@ -21,7 +149,7 @@ cp Caddyfile.example Caddyfile
 cp .env.example .env
 ```
 
-### 2. Configure Environment Variables
+#### 2. Configure Environment Variables
 
 Edit `.env` with your configuration:
 
@@ -35,13 +163,13 @@ At minimum, set:
 - `STRIPE_SECRET_KEY` - Stripe API key
 - Blockchain RPC URLs
 
-### 3. Start Services
+#### 3. Start Services
 
 ```bash
 docker compose up -d
 ```
 
-### 4. Verify Services
+#### 4. Verify Services
 
 ```bash
 # Check service status
@@ -51,19 +179,19 @@ docker compose ps
 docker compose logs -f
 
 # Test API health
-curl http://localhost:3000/health
+curl http://localhost:3001/api/v1/health
 ```
 
-## Production Deployment
+### Self-Hosted Production Deployment
 
-### Prerequisites
+#### Prerequisites
 
 - Ubuntu 24.04 LTS server (16GB RAM, 4 vCPU, 200GB disk)
 - Docker and Docker Compose installed
 - Domain DNS configured pointing to server
 - Ports 80 and 443 open in firewall
 
-### Steps
+#### Steps
 
 1. **Clone Repository**
    ```bash
@@ -102,15 +230,18 @@ curl http://localhost:3000/health
 5. **Verify Deployment**
    ```bash
    # Check SSL certificate
-   curl -I https://api.audifi.io/health
-   
-   # Test WebSocket (requires wscat)
-   wscat -c wss://api.audifi.io/ws/
+   curl -I https://api.audifi.io/api/v1/health
    ```
+
+---
 
 ## Frontend Deployment (Vercel)
 
 The frontend is deployed to Vercel. Configuration is in `../vercel.json`.
+
+### Automatic Deployment
+
+Push to the `main` branch triggers automatic deployment via Vercel GitHub integration.
 
 ### Manual Deployment
 
@@ -119,76 +250,27 @@ cd ..
 npx vercel --prod
 ```
 
-### Automatic Deployment
-
-Push to the `main` branch triggers automatic deployment via Vercel GitHub integration.
-
-## Architecture
-
-```
-Internet
-    │
-    ├─▶ Vercel (audifi.io, app.audifi.io)
-    │       └── Frontend (React + Vite)
-    │
-    └─▶ Ubuntu Server (api.audifi.io, studio.audifi.io)
-            │
-            ├── Caddy/Nginx (Reverse Proxy, TLS)
-            │       │
-            │       ├── API Server (:3000)
-            │       ├── WebSocket Server (:3001)
-            │       └── Worker (:3002)
-            │
-            ├── PostgreSQL (:5432)
-            └── Redis (:6379)
-```
-
-## Scaling
-
-### Horizontal Scaling
-
-Add more API/WebSocket server replicas:
-
-```yaml
-# In docker-compose.yml
-api-server:
-  deploy:
-    replicas: 3
-```
-
-### Database Scaling
-
-For production, consider:
-- Managed PostgreSQL (Supabase, Neon, RDS)
-- Managed Redis (Upstash, ElastiCache)
-
-## Monitoring
-
-### Health Checks
-
-- API: `https://api.audifi.io/health`
-- WebSocket: `wss://api.audifi.io/ws/`
-
-### Logs
-
-```bash
-# All logs
-docker compose logs -f
-
-# Specific service
-docker compose logs -f api-server
-```
-
-### Metrics
-
-Prometheus and Grafana are included in the Docker Compose setup.
-
-- Prometheus: `http://localhost:9090`
-- Grafana: `http://localhost:3000` (admin / password from .env)
+---
 
 ## Troubleshooting
 
-### Service Won't Start
+### Fly.io Issues
+
+```bash
+# Check deployment logs
+flyctl logs --app audifi-api
+
+# Check VM status
+flyctl status --app audifi-api
+
+# Restart app
+flyctl apps restart audifi-api
+
+# Check secrets
+flyctl secrets list --app audifi-api
+```
+
+### Docker Compose Issues
 
 ```bash
 # Check logs
@@ -201,30 +283,22 @@ docker compose ps
 docker compose restart <service-name>
 ```
 
-### SSL Certificate Issues
-
-```bash
-# For Caddy, check logs
-docker compose logs caddy
-
-# For Nginx with Certbot
-sudo certbot certificates
-sudo certbot renew --dry-run
-```
-
 ### Database Connection Issues
 
+For Fly.io:
 ```bash
-# Check if Postgres is running
-docker compose ps postgres
+flyctl postgres connect --app audifi-db
+```
 
-# Connect to database
+For Docker Compose:
+```bash
 docker compose exec postgres psql -U audifi -d audifi
 ```
 
 ## Security Notes
 
-- Never commit `.env` file to version control
+- Never commit `.env` file or secrets to version control
+- Use `fly secrets set` for Fly.io secrets
 - Rotate secrets regularly
 - Keep Docker images updated
 - Review firewall rules periodically
@@ -233,4 +307,5 @@ docker compose exec postgres psql -U audifi -d audifi
 
 - [Network Topology](../docs/networking/audifi-network-topology.md)
 - [Security Alignment](../docs/networking/audifi-security-alignment.md)
-- [Observability](../docs/networking/audifi-observability.md)
+- [CI/CD Strategy](../docs/cicd/audifi-cicd-strategy.md)
+- [Backend Pipeline](../docs/cicd/audifi-backend-pipeline.md)

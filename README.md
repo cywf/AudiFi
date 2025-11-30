@@ -176,16 +176,48 @@ cd server
 npm run lint
 ```
 
-## 🐳 Docker Deployment
+## 🚀 Deployment
+
+### Production Architecture
+
+```
+Internet
+    │
+    ├─▶ Vercel (audifi.io)
+    │       └── Frontend (React + Vite)
+    │
+    └─▶ Fly.io (audifi-api.fly.dev)
+            ├── Backend API (Express.js)
+            └── Fly Postgres (PostgreSQL 16)
+```
+
+### Backend Deployment (Fly.io)
+
+The backend API is deployed to Fly.io. See [deploy/README.md](deploy/README.md) for full setup instructions.
 
 ```bash
-# Build and run with docker-compose
+cd server
+flyctl deploy
+```
+
+Required secrets (set via `flyctl secrets set`):
+- `DATABASE_URL` - Auto-set when attaching Fly Postgres
+- `JWT_SECRET` - JWT signing key (min 32 chars)
+- `SENDGRID_API_KEY` - For magic link emails
+
+### Frontend Deployment (Vercel)
+
+The frontend is automatically deployed via Vercel on pushes to `main`.
+
+### Local Development (Docker Compose)
+
+For local development with Docker:
+
+```bash
 cp deploy/docker-compose.yml.example deploy/docker-compose.yml
 cp deploy/.env.example deploy/.env
-# Edit deploy/.env with your configuration
-
 cd deploy
-docker-compose up -d
+docker compose up -d
 ```
 
 ## 📝 API Documentation
@@ -219,10 +251,10 @@ See [docs/api/overview.md](docs/api/overview.md) for full API reference.
 - ethers.js for Web3
 
 ### Infrastructure
-- Docker containers
-- Caddy reverse proxy
-- PostgreSQL 16
-- Redis (for caching/sessions)
+- **Frontend:** Vercel
+- **Backend API:** Fly.io
+- **Database:** Fly Postgres
+- **Local Dev:** Docker Compose
 
 ## 📄 License
 
