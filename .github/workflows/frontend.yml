@@ -1,10 +1,10 @@
 # AudiFi Frontend CI/CD Pipeline
 # 
 # This workflow handles building, testing, and deploying the AudiFi frontend
-# application to Vercel (or Fly.io as an alternative).
+# application to GitHub Pages for previews and Vercel for staging/production.
 #
 # Triggers:
-# - Pull requests: Run lint, test, build, and optionally deploy preview
+# - Pull requests: Run lint, test, build, and deploy preview to GitHub Pages
 # - Push to develop: Deploy to staging environment
 # - Push to main: Deploy to production environment
 
@@ -40,10 +40,12 @@ on:
       - 'index.html'
       - '.github/workflows/frontend.yml'
 
-# Limit permissions of GITHUB_TOKEN
+# Permissions for GitHub Pages deployment
 permissions:
   contents: read
   pull-requests: write
+  pages: write
+  id-token: write
 
 env:
   NODE_VERSION: '20'
@@ -117,7 +119,7 @@ jobs:
   #         retention-days: 7
 
   # ============================================
-  # Preview Deployment (Pull Requests)
+  # Preview Deployment (Pull Requests via GitHub Pages)
   # ============================================
   deploy-preview:
     name: Deploy Preview
@@ -127,34 +129,30 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      pages: write
+      id-token: write
     environment:
-      name: preview
-      url: ${{ steps.deploy.outputs.preview-url }}
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          name: dist
+          path: dist/
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
 
-      - name: Deploy to Vercel (Preview)
-        id: deploy
-        run: |
-          URL=$(npx vercel --token ${{ secrets.VERCEL_TOKEN }} --yes --confirm 2>&1 | tail -1)
-          echo "preview-url=$URL" >> $GITHUB_OUTPUT
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
       - name: Comment Preview URL on PR
         uses: actions/github-script@v7
@@ -164,7 +162,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🚀 **Preview Deployment Ready!**\n\n📱 Preview URL: ${{ steps.deploy.outputs.preview-url }}\n\n_This preview will be updated when you push new changes._`
+              body: `🚀 **Preview Deployment Ready!**\n\n📱 Preview URL: ${{ steps.deployment.outputs.page_url }}\n\n_This preview will be updated when you push new changes._`
             })
 
   # ============================================
