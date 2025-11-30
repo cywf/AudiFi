@@ -111,13 +111,9 @@ jobs:
         working-directory: server
         run: npm ci
 
-      - name: Install drizzle-kit
-        working-directory: server
-        run: npm install drizzle-kit
-
       - name: Run database migrations
         working-directory: server
-        run: npx drizzle-kit migrate
+        run: npm run db:migrate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
 
@@ -179,13 +175,9 @@ jobs:
         working-directory: server
         run: npm ci
 
-      - name: Install drizzle-kit
-        working-directory: server
-        run: npm install drizzle-kit
-
       - name: Run database migrations
         working-directory: server
-        run: npx drizzle-kit migrate
+        run: npm run db:migrate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}
 
