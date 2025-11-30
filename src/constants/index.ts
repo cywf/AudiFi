@@ -31,8 +31,8 @@ export const MOOD_TAGS = [
 export const WIZARD_STEPS = ['Track Details', 'Artwork', 'Economics', 'Review & Mint'] as const
 
 export const APP_CONFIG = {
-  name: 'NFT Tracks',
-  tagline: 'Mint Your Music, Earn Forever',
+  name: 'AudiFi',
+  tagline: 'Own Your Music. Share the Success.',
   maxMoodTags: 5,
   maxFileSize: {
     audio: 100 * 1024 * 1024,

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { House, ChartBar, CreditCard, Gear, MusicNote, Article, Storefront, VideoCamera, Coins, TrendUp } from '@phosphor-icons/react'
+import { House, Gear, MusicNote, Storefront, VideoCamera, Coins, TrendUp } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
