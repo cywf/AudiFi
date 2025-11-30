@@ -181,7 +181,7 @@ export function HowItWorksPage() {
               className="mb-24"
             >
               <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose NFT Tracks?</h2>
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose AudiFi?</h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                   The modern way for independent artists to monetize their music and build lasting value.
                 </p>
@@ -249,7 +249,7 @@ export function HowItWorksPage() {
       <footer className="border-t border-border/60 py-12 bg-card/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
-            <p>© 2024 NFT Tracks. Empowering independent artists.</p>
+            <p>© 2024 AudiFi. Empowering independent artists.</p>
             <div className="flex flex-wrap justify-center gap-8">
               <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Docs</a>
               <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Terms</a>

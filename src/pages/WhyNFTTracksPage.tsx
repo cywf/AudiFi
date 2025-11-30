@@ -89,12 +89,12 @@ export function WhyNFTTracksPage() {
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
                 Why Independent Artists Need{' '}
                 <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                  NFT Tracks
+                  AudiFi
                 </span>
               </h1>
               <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                 The music industry is broken. Artists create all the value but see the smallest share. 
-                NFT Tracks fixes this with blockchain-enforced fairness—putting power back in artists' hands.
+                AudiFi fixes this with blockchain-enforced fairness—putting power back in artists' hands.
               </p>
             </motion.div>
 
@@ -158,7 +158,7 @@ export function WhyNFTTracksPage() {
               className="mb-24"
             >
               <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4">The NFT Tracks Solution</h2>
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">The AudiFi Solution</h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                   Smart contracts enforce fairness automatically. No lawyers, no negotiations, no tricks.
                 </p>
@@ -268,7 +268,7 @@ export function WhyNFTTracksPage() {
                   <div className="max-w-3xl mx-auto space-y-6 text-lg text-muted-foreground leading-relaxed">
                     <p>
                       In traditional music, artists think about ROI across their entire catalog. A hit single subsidizes the rest of the album. 
-                      <span className="text-foreground font-semibold"> With NFT Tracks, each song is its own investment.</span>
+                      <span className="text-foreground font-semibold"> With AudiFi, each song is its own investment.</span>
                     </p>
 
                     <div className="grid sm:grid-cols-2 gap-6 my-8">
@@ -375,7 +375,7 @@ export function WhyNFTTracksPage() {
       <footer className="border-t border-border/60 py-12 bg-card/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
-            <p>© 2024 NFT Tracks. Empowering independent artists.</p>
+            <p>© 2024 AudiFi. Empowering independent artists.</p>
             <div className="flex flex-wrap justify-center gap-8">
               <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Docs</a>
               <a href="#" className="hover:text-foreground transition-colors hover:underline underline-offset-4">Terms</a>

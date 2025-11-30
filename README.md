@@ -1,17 +1,18 @@
-# NFT Tracks
+# AudiFi
 
-**NFT Tracks** is a platform for independent music artists to mint their tracks as one-of-one NFTs, retain full ownership, and earn perpetual royalties on every resale. Dream it. Mint it. Get paid forever.
+**AudiFi** is a Web3 platform that empowers independent music artists to launch Master IPOs, giving fans the opportunity to own fractional NFT shares of their favorite tracks. Artists retain control, earn automatic dividends, and build direct relationships with their supporters.
+
+> Own Your Music. Share the Success.
 
 ## 🎵 Overview
 
-NFT Tracks empowers artists to:
-- Upload music tracks and artwork
-- Configure release metadata (genre, BPM, mood, description)
-- Mint tracks as NFTs stored on IPFS
-- List NFTs for sale
-- Earn automatic royalties on all secondary market resales
+AudiFi enables artists to:
+- **Launch Master IPOs** - Sell NFT shares of music masters to fans
+- **V Studio Sessions** - Bring fans into the creative process with live production sessions
+- **Automatic Dividends** - NFT holders receive payouts when masters generate revenue
+- **Mover Advantage** - Early supporters earn royalties on every resale (10%/5%/3%/1%)
 
-This is the **frontend application** built with React + TypeScript, featuring mock APIs and integration placeholders for future Web3 and payment infrastructure.
+This is the **frontend application** built with React 19 + TypeScript, featuring mock APIs and integration placeholders for future Web3 and payment infrastructure.
 
 ## 🚀 Quick Start
 
@@ -42,131 +43,104 @@ src/
 ├── api/                    # Mock API layer
 │   ├── user.ts            # User data operations
 │   ├── tracks.ts          # Track CRUD operations
+│   ├── masterIPO.ts       # Master IPO operations
 │   ├── subscription.ts    # Subscription/pricing data
 │   └── marketplace.ts     # Marketplace listings and purchases
 ├── components/
 │   ├── layout/            # Layout components
 │   │   ├── MainLayout.tsx # Main app layout with nav
 │   │   └── NavBar.tsx     # Landing page navigation
+│   ├── audio/             # Audio components
+│   │   └── AudioPlayer.tsx # Custom audio player
 │   ├── dashboard/         # Dashboard-specific components
-│   │   └── StatCard.tsx   # Stats display with earnings variant
+│   │   ├── StatCard.tsx   # Stats display with earnings variant
+│   │   └── StatCardSkeleton.tsx # Loading skeleton
 │   ├── tracks/            # Track-related components
 │   │   ├── TrackCard.tsx
 │   │   ├── MarketplaceTrackCard.tsx
 │   │   ├── MarketplaceFilters.tsx
+│   │   ├── TrackCardSkeleton.tsx
 │   │   └── PurchaseModal.tsx
-│   ├── pricing/           # Pricing components
-│   │   └── PricingTierCard.tsx
-│   ├── wizard/            # Wizard/form components
-│   │   └── StepIndicator.tsx
 │   ├── profile/           # Profile components
-│   │   ├── SocialMediaLinks.tsx
-│   │   ├── MusicPlatformLinks.tsx
-│   │   └── TwoFactorSetup.tsx
 │   └── ui/                # shadcn UI components
-├── constants/             # App constants
-│   └── index.ts           # Genres, mood tags, config
-├── lib/                   # Integration stubs and utilities
-│   ├── wallet.ts          # MetaMask wallet stub
-│   ├── payments.ts        # Stripe payment stub
-│   └── utils.ts           # Utility functions (cn, etc.)
 ├── pages/                 # Route pages
 │   ├── LandingPage.tsx    # Home page with hero
 │   ├── DashboardPage.tsx  # Artist dashboard
-│   ├── CreateTrackPage.tsx # Multi-step track creation wizard
+│   ├── MarketplacePage.tsx # NFT marketplace
 │   ├── TrackDetailPage.tsx # Individual track view
-│   ├── PricingPage.tsx    # Subscription tiers
-│   ├── SettingsPage.tsx   # Account settings
-│   ├── ProfilePage.tsx    # Artist profile management
-│   ├── SignupPage.tsx     # Account creation
-│   ├── HowItWorksPage.tsx # Educational page
-│   ├── WhyNFTTracksPage.tsx # Value proposition
-│   └── MarketplacePage.tsx # NFT marketplace
+│   ├── artist/            # Artist-specific pages
+│   ├── fan/               # Fan portal pages
+│   ├── vstudio/           # V Studio pages
+│   └── master-ipo/        # Master IPO pages
 ├── types/                 # TypeScript type definitions
-│   └── index.ts
 ├── App.tsx               # Root app with routing
 ├── index.css             # CSS variables and base styles
-├── main.css              # Tailwind imports and theme mapping
-└── main.tsx              # App entry point
+└── main.css              # Tailwind imports and theme mapping
 ```
 
-## 🎯 Key Features
+## 🎯 Main User Flows
 
 ### 1. Landing Page (`/`)
-- Hero section with value proposition
-- Feature showcase
+- Hero section with Master IPO value proposition
+- Feature showcase (Master IPO, V Studio, Mover Advantage, Dividends)
 - Call-to-action buttons
 
-### 2. Dashboard (`/dashboard`)
-- Overview stats (total tracks, sales, royalties)
-- Track management grid
-- Quick access to create new tracks
+### 2. Artist Dashboard (`/artist`)
+- Overview stats (total tracks, sales, royalties, supporters)
+- Draft and published track sections
+- Quick access to create new Master IPOs
 
-### 3. Create Track Wizard (`/tracks/new`)
-Multi-step wizard with:
-- **Step 1:** Track details (title, genre, BPM, mood tags, description, audio upload)
-- **Step 2:** Artwork upload
-- **Step 3:** Economics (pricing, royalties, release date)
-- **Step 4:** Review and mint simulation
+### 3. Marketplace (`/marketplace/masters`)
+- Browse and discover Master IPOs from artists
+- Filter by genre, blockchain, and price
+- Multi-blockchain support (Ethereum/Solana)
+- Purchase NFT shares with wallet connection
 
 ### 4. Track Detail Page (`/tracks/:id`)
-- Complete track information
-- Artwork and waveform visualization
-- Ownership and IPFS hash display
-- Purchase simulation for visitors
+- Large cover art with audio player
+- Artist info, genre, BPM, mood tags
+- Ownership section with IPFS hash and blockchain badge
+- Economics section (royalty percent, secondary resale)
+- Activity section with event history
+- Purchase button for listed tracks
 
-### 5. Pricing Page (`/pricing`)
-- Free vs Pro tier comparison
-- FAQ section
-- Simulated Stripe checkout
-
-### 6. Settings Page (`/settings`)
-- Profile information
-- Wallet connection (MetaMask stub)
-- Subscription management
-
-### 7. Marketplace (`/marketplace`)
-- Browse and discover listed NFT tracks
-- Filter by genre, blockchain, and price
-- Multi-blockchain support (Ethereum/Solana simulation)
-- Purchase flow with wallet connection
-
-### 8. Profile Page (`/profile`)
+### 5. Profile Page (`/profile`)
 - Artist profile customization
-- Social media links
-- Music platform links
+- Social media and music platform links
 - Two-factor authentication setup
 
-### 9. How It Works (`/how-it-works`)
-- Step-by-step guide to the minting process
-- Animated visual walkthrough
-- Benefits of the platform
+### 6. Settings Page (`/settings`)
+- Account information
+- Wallet connection (MetaMask stub)
+- Security settings
 
-### 10. Why NFT Tracks (`/why-nft-tracks`)
-- Educational content about music industry challenges
-- Explanation of the 10% perpetual royalty model
-- Track-level ROI concept
-
-### 11. Signup (`/signup`)
-- Account creation flow
-- Terms acceptance
-- Profile initialization
-
-## 🎨 Design System
+## 🎨 AudiFi Design System
 
 ### Colors (oklch)
-- **Primary:** Deep Purple (`oklch(0.45 0.18 300)`) - Creative/artistic brand color
-- **Secondary:** Dark Cyan (`oklch(0.55 0.12 200)`) - Technical/blockchain accent
-- **Accent:** Bright Cyan (`oklch(0.75 0.15 200)`) - Call-to-action and highlights
-- **Warning:** Warm Amber (`oklch(0.65 0.15 80)`) - Value/earnings displays
-- **Background:** Dark Slate (`oklch(0.15 0.02 260)`)
+| Token | Value | Usage |
+|-------|-------|-------|
+| **Primary** | `oklch(0.48 0.20 295)` | Deep purple - creative/artistic brand |
+| **Secondary** | `oklch(0.58 0.14 210)` | Dark cyan - technical/blockchain accent |
+| **Accent** | `oklch(0.72 0.17 195)` | Bright cyan - CTAs and highlights |
+| **Warning** | `oklch(0.68 0.16 85)` | Warm amber - earnings/royalty displays |
+| **Background** | `oklch(0.14 0.015 260)` | Dark slate background |
 
 ### Typography
 - **Font:** Inter (Google Fonts)
 - **Scale:** 12px (caption) → 14px (body) → 18px (h3) → 24px (h2) → 36px (h1)
 
 ### Components
-Built with **shadcn/ui v4** components, customized for the music/crypto aesthetic.
+Built with **shadcn/ui v4** components, customized for the music/crypto aesthetic:
+- **Skeleton loaders** for marketplace and dashboard loading states
+- **AudioPlayer** component for track playback
+- **TooltipProvider** for contextual help (royalty badges, blockchain info)
+- **Dialog/Modal** for purchase flows
+- **Sonner** for toast notifications
+
+### Motion
+- **Transitions:** 150-250ms with ease-out
+- **Hover effects:** Subtle lift and scale on cards (scale-[1.02])
+- **Shadows:** Accent-tinted shadows on hover
 
 ## 🔌 Mock APIs & Integrations
 
@@ -175,7 +149,9 @@ All data operations use mock APIs with simulated latency:
 ### Mock APIs
 - `api/user.ts` - User profile management
 - `api/tracks.ts` - Track CRUD and minting simulation
-- `api/subscription.ts` - Pricing plans
+- `api/masterIPO.ts` - Master IPO operations
+- `api/marketplace.ts` - Marketplace listings and purchases
+- `api/dividends.ts` - Dividend tracking and claims
 
 ### Integration Stubs
 - `lib/wallet.ts` - MetaMask connection placeholder
@@ -194,81 +170,58 @@ Mock data is stored in `localStorage` for demo purposes. In production, this wou
 - **Notifications:** Sonner
 - **Build Tool:** Vite
 
-## 📝 Type Definitions
+## 🚀 Deployment
 
-Key TypeScript interfaces:
+### Production & Preview (Vercel)
 
-```typescript
-interface User {
-  id: string
-  name: string
-  email: string
-  walletAddress?: string
-  subscriptionPlan: "FREE" | "PRO"
-  createdAt: string
-}
+The production frontend is deployed on **Vercel** via Git integration:
 
-interface Track {
-  id: string
-  title: string
-  description: string
-  genre: string
-  bpm?: number
-  moodTags: string[]
-  audioFileName: string
-  coverImageUrl?: string
-  artistId: string
-  status: "DRAFT" | "MINTED" | "LISTED" | "SOLD"
-  ipfsHash?: string
-  ownerWalletAddress?: string
-  currentPrice?: number
-  currency?: "ETH" | "USD"
-  royaltyPercent: number
-  releaseDate?: string
-  allowSecondaryResale?: boolean
-  createdAt: string
-  updatedAt: string
-}
+- **Production:** Deploys automatically from the `main` branch to [audifi.io](https://audifi.io)
+- **Previews:** Each pull request gets an automatic preview deployment on Vercel
 
-interface SubscriptionPlan {
-  id: string
-  name: string
-  pricePerMonthUSD: number
-  maxTracks: number | null
-  features: string[]
-}
-```
+Vercel handles all production and preview deployments directly from the repository. No GitHub Actions workflow deploys to Vercel.
+
+### Demo Site (GitHub Pages)
+
+A read-only demo build is deployed from the `demo` branch to **GitHub Pages**:
+
+- **Demo URL:** Available at the repository's GitHub Pages URL
+- **Trigger:** Push to the `demo` branch only
+- **Purpose:** Showcase the frontend without Vercel infrastructure
+
+To update the demo site, merge changes into the `demo` branch.
+
+### CI Checks
+
+The GitHub Actions workflow (`.github/workflows/frontend.yml`) runs on all PRs and pushes:
+
+- ESLint linting
+- TypeScript build
+- Production build verification
+
+CI must pass before merging PRs.
 
 ## 🔮 Future Integration Points
 
 This frontend is designed for easy integration with:
 
 1. **Web3 Backend**
-   - Replace `lib/wallet.ts` with actual MetaMask/WalletConnect integration
-   - Implement smart contract calls for minting and transfers
-   - Connect to real blockchain networks (Ethereum, Polygon, etc.)
+   - MetaMask/WalletConnect integration
+   - Smart contract calls for Master IPOs and NFT transfers
+   - Multi-chain support (Ethereum, Solana)
 
 2. **IPFS Storage**
-   - Replace simulated file uploads with actual IPFS pinning services
-   - Store audio files and artwork on IPFS
-   - Generate and store metadata JSON on IPFS
+   - Audio and artwork storage
+   - NFT metadata JSON
 
 3. **Payment Processing**
-   - Replace `lib/payments.ts` with actual Stripe integration
-   - Implement webhook handlers for subscription events
-   - Support both crypto and fiat payments
+   - Stripe integration for fiat payments
+   - Crypto payment support
 
 4. **Backend API**
-   - Replace mock APIs with real REST/GraphQL endpoints
-   - Implement authentication and authorization
-   - Add database persistence (PostgreSQL, MongoDB, etc.)
-
-## 🎭 Demo Data
-
-The app includes sample tracks with realistic metadata:
-- "Midnight Pulse" (Deep House, Minted)
-- "Neon Dreams" (Synthwave, Listed)
-- "Untitled Project" (Experimental, Draft)
+   - Real REST/GraphQL endpoints
+   - Authentication and authorization
+   - Database persistence
 
 ## 📄 License
 

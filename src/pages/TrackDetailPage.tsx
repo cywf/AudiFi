@@ -2,17 +2,23 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { AudioPlayer } from '@/components/audio/AudioPlayer'
 import { 
   MusicNote, 
   ArrowLeft, 
   ShoppingCart, 
   Eye,
   Copy,
-  CheckCircle
+  CheckCircle,
+  Tag,
+  ShoppingCartSimple,
+  ChartLine,
+  ArrowsClockwise,
+  Info
 } from '@phosphor-icons/react'
 import { getTrackById, simulatePurchase } from '@/api/tracks'
 import { truncateAddress } from '@/lib/wallet'
@@ -27,6 +33,40 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+
+// Mock activity events for the track
+interface ActivityEvent {
+  id: string
+  type: 'MINTED' | 'LISTED' | 'PRICE_CHANGE' | 'SOLD' | 'TRANSFER'
+  timestamp: string
+  details: string
+  fromWallet?: string
+  toWallet?: string
+  price?: number
+  currency?: string
+}
+
+const getActivityIcon = (type: ActivityEvent['type']) => {
+  switch (type) {
+    case 'MINTED':
+      return <MusicNote size={16} weight="fill" className="text-primary" />
+    case 'LISTED':
+      return <Tag size={16} weight="fill" className="text-accent" />
+    case 'PRICE_CHANGE':
+      return <ChartLine size={16} weight="fill" className="text-secondary" />
+    case 'SOLD':
+      return <ShoppingCartSimple size={16} weight="fill" className="text-warning" />
+    case 'TRANSFER':
+      return <ArrowsClockwise size={16} weight="fill" className="text-muted-foreground" />
+    default:
+      return <Info size={16} className="text-muted-foreground" />
+  }
+}
 
 const statusConfig: Record<TrackStatus, { label: string; className: string }> = {
   DRAFT: { label: 'Draft', className: 'bg-muted/80 text-muted-foreground' },
@@ -110,6 +150,56 @@ export function TrackDetailPage() {
 
   const statusInfo = statusConfig[track.status]
   const isArtist = track.artistId === 'user_001'
+  const artistName = isArtist ? 'You' : 'Demo Artist'
+
+  // Generate mock activity events based on track status
+  const generateMockActivity = (track: Track): ActivityEvent[] => {
+    const events: ActivityEvent[] = []
+    const baseDate = new Date(track.createdAt)
+    
+    // Minted event always present for non-draft tracks
+    if (track.status !== 'DRAFT') {
+      events.push({
+        id: '1',
+        type: 'MINTED',
+        timestamp: baseDate.toISOString(),
+        details: 'Track minted as NFT',
+      })
+    }
+    
+    // Listed event for listed/sold tracks
+    if (track.status === 'LISTED' || track.status === 'SOLD') {
+      const listDate = new Date(baseDate)
+      listDate.setHours(listDate.getHours() + 2)
+      events.push({
+        id: '2',
+        type: 'LISTED',
+        timestamp: listDate.toISOString(),
+        details: `Listed for ${track.currentPrice} ${track.currency}`,
+        price: track.currentPrice,
+        currency: track.currency,
+      })
+    }
+    
+    // Sold event
+    if (track.status === 'SOLD') {
+      const soldDate = new Date(baseDate)
+      soldDate.setDate(soldDate.getDate() + 1)
+      events.push({
+        id: '3',
+        type: 'SOLD',
+        timestamp: soldDate.toISOString(),
+        details: `Sold for ${track.currentPrice} ${track.currency}`,
+        price: track.currentPrice,
+        currency: track.currency,
+        toWallet: track.ownerWalletAddress,
+      })
+    }
+    
+    return events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+  }
+
+  const activityEvents = generateMockActivity(track)
 
   return (
     <MainLayout>
@@ -142,24 +232,8 @@ export function TrackDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/60">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex-1 h-12 bg-gradient-to-r from-accent/30 via-primary/30 to-accent/30 rounded flex items-center px-2 gap-1">
-                    {Array.from({ length: 40 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 bg-accent/50 rounded-sm"
-                        style={{ height: `${Math.random() * 80 + 20}%` }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground text-center">
-                  Waveform visualization
-                </p>
-              </CardContent>
-            </Card>
+            {/* Audio Player */}
+            <AudioPlayer title={track.title} />
           </div>
 
           <div className="space-y-5 md:space-y-6">
@@ -167,11 +241,35 @@ export function TrackDetailPage() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3 md:mb-4">
                 <div className="min-w-0 flex-1">
                   <h1 className="text-3xl sm:text-4xl font-bold mb-2 break-words">{track.title}</h1>
-                  <p className="text-muted-foreground text-sm sm:text-base">{track.genre}</p>
+                  <Link to="/profile" className="text-muted-foreground text-sm sm:text-base hover:text-accent transition-colors">
+                    by {artistName}
+                  </Link>
+                  <span className="text-muted-foreground text-sm"> • {track.genre}</span>
                 </div>
-                <Badge className={cn('font-medium shrink-0', statusInfo.className)}>
-                  {statusInfo.label}
-                </Badge>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge className={cn('font-medium', statusInfo.className)}>
+                        {statusInfo.label}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Track status: {statusInfo.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  {track.blockchain && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Badge variant="secondary" className="text-xs capitalize">
+                          {track.blockchain}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>This track is on the {track.blockchain === 'ethereum' ? 'Ethereum' : 'Solana'} network</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
               </div>
 
               {track.description && (
@@ -188,10 +286,17 @@ export function TrackDetailPage() {
                   <p className="font-semibold text-sm sm:text-base">{track.bpm}</p>
                 </div>
               )}
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Royalty</p>
-                <p className="font-semibold text-sm sm:text-base">{track.royaltyPercent}%</p>
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="cursor-help">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Royalty</p>
+                    <p className="font-semibold text-sm sm:text-base">{track.royaltyPercent}%</p>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Artist receives {track.royaltyPercent}% on every secondary sale</p>
+                </TooltipContent>
+              </Tooltip>
               {track.releaseDate && (
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">Release Date</p>
@@ -299,6 +404,48 @@ export function TrackDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Activity Section */}
+        {activityEvents.length > 0 && (
+          <Card className="border-border/60 mt-8">
+            <CardHeader>
+              <CardTitle className="text-lg">Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {activityEvents.map((event) => (
+                  <div key={event.id} className="flex items-start gap-3 pb-4 border-b border-border/40 last:border-0 last:pb-0">
+                    <div className="mt-0.5 p-2 rounded-full bg-muted">
+                      {getActivityIcon(event.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm">{event.details}</p>
+                      {event.toWallet && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          To: {truncateAddress(event.toWallet)}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(event.timestamp).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                    {event.price && (
+                      <span className="text-sm font-semibold text-accent shrink-0">
+                        {event.price} {event.currency}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <Dialog open={showPurchaseDialog} onOpenChange={setShowPurchaseDialog}>

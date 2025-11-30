@@ -22,7 +22,7 @@ const mockPlans: SubscriptionPlan[] = [
     pricePerMonthUSD: 15,
     maxTracks: null,
     features: [
-      'Unlimited NFT Tracks',
+      'Unlimited Master IPOs',
       'Advanced analytics and insights',
       'Royalty tracking dashboard',
       'Priority support',

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { MarketplaceTrackCard } from '@/components/tracks/MarketplaceTrackCard'
+import { MarketplaceTrackCardSkeleton } from '@/components/tracks/MarketplaceTrackCardSkeleton'
 import { MarketplaceFiltersPanel } from '@/components/tracks/MarketplaceFilters'
 import { PurchaseModal } from '@/components/tracks/PurchaseModal'
-import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Storefront, Info } from '@phosphor-icons/react'
 import { getMarketplaceListings, getAvailableGenres, type MarketplaceFilters } from '@/api/marketplace'
@@ -75,8 +75,10 @@ export function MarketplacePage() {
         />
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <LoadingSpinner size="lg" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <MarketplaceTrackCardSkeleton key={i} />
+            ))}
           </div>
         ) : tracks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
