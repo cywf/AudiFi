@@ -42,4 +42,4 @@ primary_region = "iad"
 
 # Run database migrations before starting the app
 [deploy]
-  release_command = "npm run db:migrate"
+  release_command = "npx drizzle-kit migrate"

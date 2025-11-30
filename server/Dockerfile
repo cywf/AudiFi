@@ -33,9 +33,11 @@ RUN addgroup -g 1001 -S audifi && \
 
 WORKDIR /app
 
-# Copy package files and install production dependencies only
+# Copy package files and install production dependencies plus drizzle-kit for migrations
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --only=production && \
+    npm install drizzle-kit && \
+    npm cache clean --force
 
 # Copy built artifacts from builder stage
 COPY --from=builder /app/dist ./dist
