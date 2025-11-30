@@ -9,6 +9,11 @@
 # - Artist Coin & liquidity integrations
 # - Auth, subscriptions, and analytics
 #
+# Database:
+# - Uses Neon PostgreSQL (not Fly Postgres)
+# - Migrations run via drizzle-kit before deployment
+# - DATABASE_URL secret must be configured in GitHub repository settings
+#
 # Deployment:
 # - Staging: Deploys to audifi-api-staging on pushes to develop
 # - Production: Deploys to audifi-api on pushes to main
@@ -86,6 +91,7 @@ jobs:
 
   # ============================================
   # Deploy to Staging (Fly.io)
+  # Uses Neon PostgreSQL for database
   # ============================================
   deploy-staging:
     name: Deploy to Staging
@@ -111,11 +117,11 @@ jobs:
         working-directory: server
         run: npm ci
 
-      - name: Run database migrations
+      - name: Run database migrations (Neon)
         working-directory: server
-        run: npm run db:migrate
+        run: npx drizzle-kit migrate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
@@ -138,6 +144,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`develop\`" >> $GITHUB_STEP_SUMMARY
           echo "**Environment:** Staging (Fly.io)" >> $GITHUB_STEP_SUMMARY
+          echo "**Database:** Neon PostgreSQL" >> $GITHUB_STEP_SUMMARY
           echo "**App URL:** https://audifi-api-staging.fly.dev" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
@@ -150,6 +157,7 @@ jobs:
 
   # ============================================
   # Deploy to Production (Fly.io)
+  # Uses Neon PostgreSQL for database
   # ============================================
   deploy-production:
     name: Deploy to Production
@@ -175,11 +183,11 @@ jobs:
         working-directory: server
         run: npm ci
 
-      - name: Run database migrations
+      - name: Run database migrations (Neon)
         working-directory: server
-        run: npm run db:migrate
+        run: npx drizzle-kit migrate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
@@ -202,6 +210,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`main\`" >> $GITHUB_STEP_SUMMARY
           echo "**Environment:** Production (Fly.io)" >> $GITHUB_STEP_SUMMARY
+          echo "**Database:** Neon PostgreSQL" >> $GITHUB_STEP_SUMMARY
           echo "**App URL:** https://audifi-api.fly.dev" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY

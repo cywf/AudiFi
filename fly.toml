@@ -2,6 +2,8 @@
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
+# NOTE: This is the root fly.toml. The backend API uses server/fly.toml instead.
+# Database is managed via Neon PostgreSQL (external service, not Fly Postgres).
 
 app = 'audifi'
 primary_region = 'iad'
