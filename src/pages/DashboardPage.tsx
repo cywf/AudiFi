@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { StatCard } from '@/components/dashboard/StatCard'
+import { StatCardSkeleton } from '@/components/dashboard/StatCardSkeleton'
 import { TrackCard } from '@/components/tracks/TrackCard'
-import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { TrackCardSkeleton } from '@/components/tracks/TrackCardSkeleton'
 import { Button } from '@/components/ui/button'
-import { Plus, MusicNote, CurrencyEth, TrendUp } from '@phosphor-icons/react'
+import { Plus, MusicNote, CurrencyEth, TrendUp, Users } from '@phosphor-icons/react'
 import { getTracksForCurrentUser } from '@/api/tracks'
 import type { Track } from '@/types'
 
@@ -32,6 +33,11 @@ export function DashboardPage() {
     .reduce((sum, t) => sum + (t.currentPrice || 0), 0)
 
   const totalRoyalties = totalSales * 0.1
+  
+  // Separate tracks by status
+  const draftTracks = tracks.filter(t => t.status === 'DRAFT')
+  const publishedTracks = tracks.filter(t => t.status !== 'DRAFT')
+  const listedTracks = tracks.filter(t => t.status === 'LISTED')
 
   return (
     <MainLayout>
@@ -40,7 +46,7 @@ export function DashboardPage() {
           <div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Dashboard</h1>
             <p className="text-muted-foreground mt-2 text-sm sm:text-base">
-              Manage your NFT tracks and track your earnings
+              Manage your music masters and track your earnings
             </p>
           </div>
           <Link to="/tracks/new" className="w-full sm:w-auto">
@@ -51,38 +57,69 @@ export function DashboardPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-          <StatCard
-            label="Total Tracks"
-            value={tracks.length}
-            icon={<MusicNote size={28} weight="duotone" />}
-          />
-          <StatCard
-            label="Primary Sales"
-            value={`${totalSales.toFixed(2)} ETH`}
-            icon={<CurrencyEth size={28} weight="duotone" />}
-            trend={{ value: '+12% this month', positive: true }}
-            variant="earnings"
-          />
-          <StatCard
-            label="Total Royalties"
-            value={`${totalRoyalties.toFixed(3)} ETH`}
-            icon={<TrendUp size={28} weight="duotone" />}
-            trend={{ value: '+8% this month', positive: true }}
-            variant="earnings"
-          />
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
+            <StatCard
+              label="Total Tracks"
+              value={tracks.length}
+              icon={<MusicNote size={28} weight="duotone" />}
+            />
+            <StatCard
+              label="Primary Sales"
+              value={`${totalSales.toFixed(2)} ETH`}
+              icon={<CurrencyEth size={28} weight="duotone" />}
+              trend={{ value: '+12% this month', positive: true }}
+              variant="earnings"
+            />
+            <StatCard
+              label="Total Royalties"
+              value={`${totalRoyalties.toFixed(3)} ETH`}
+              icon={<TrendUp size={28} weight="duotone" />}
+              trend={{ value: '+8% this month', positive: true }}
+              variant="earnings"
+            />
+            <StatCard
+              label="Supporters"
+              value={listedTracks.length > 0 ? listedTracks.length * 3 : 0}
+              icon={<Users size={28} weight="duotone" />}
+            />
+          </div>
+        )}
 
+        {/* Drafts Section */}
+        {draftTracks.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6 md:mb-8">
+              <h2 className="text-xl md:text-2xl font-semibold">Drafts</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+              {draftTracks.map((track) => (
+                <TrackCard key={track.id} track={track} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Published Tracks Section */}
         <div>
           <div className="flex items-center justify-between mb-6 md:mb-8">
-            <h2 className="text-xl md:text-2xl font-semibold">Your Tracks</h2>
+            <h2 className="text-xl md:text-2xl font-semibold">Published Tracks</h2>
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <LoadingSpinner size="lg" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <TrackCardSkeleton key={i} />
+              ))}
             </div>
-          ) : tracks.length === 0 ? (
+          ) : publishedTracks.length === 0 ? (
             <div className="text-center py-16 md:py-20">
               <div className="mb-6 text-muted-foreground/50">
                 <MusicNote size={64} weight="duotone" className="mx-auto" />
@@ -100,12 +137,16 @@ export function DashboardPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-              {tracks.map((track) => (
+              {publishedTracks.map((track) => (
                 <TrackCard key={track.id} track={track} />
               ))}
             </div>
           )}
         </div>
+
+        {/* Role-aware placeholder for future Producer/Viewer dashboards */}
+        {/* TODO: if (user.role === 'PRODUCER') { render ProducerDashboard } */}
+        {/* TODO: if (user.role === 'VIEWER') { render ViewerDashboard } */}
       </div>
     </MainLayout>
   )
