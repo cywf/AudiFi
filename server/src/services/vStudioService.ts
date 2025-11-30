@@ -21,7 +21,6 @@ import type {
   VStudioDecisionPoint,
   VStudioPollOption,
   VStudioVote,
-  DecisionPointStatus,
   SubscriptionPlan
 } from '../types/index.js';
 

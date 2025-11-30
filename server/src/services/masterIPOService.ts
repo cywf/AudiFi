@@ -21,7 +21,6 @@ import type {
   Master, 
   MasterIPO, 
   MasterType,
-  MasterIPOStatus,
   MasterNFTHolder,
   BlockchainNetwork,
   IPOCurrency,

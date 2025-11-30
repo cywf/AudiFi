@@ -138,10 +138,15 @@ export async function getDividendContractByMaster(masterId: string): Promise<Div
 
 /**
  * Get all Dividend Contracts for an artist
+ * 
+ * TODO(PRODUCTION): Replace with database query:
+ *   SELECT dc.* FROM dividend_contracts dc
+ *   JOIN masters m ON dc.master_id = m.id
+ *   WHERE m.artist_id = $artistId
  */
-export async function getDividendContractsByArtist(artistId: string): Promise<DividendContract[]> {
-  // This would need to join with Masters to filter by artistId
-  // For now, return all contracts (in production, implement proper query)
+export async function getDividendContractsByArtist(_artistId: string): Promise<DividendContract[]> {
+  // Currently using in-memory store - returns all contracts
+  // In production: filter by artistId via database join
   return Array.from(dividendContracts.values());
 }
 

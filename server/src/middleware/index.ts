@@ -6,6 +6,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { UserRole, ApiError, ApiResponse } from '../types/index.js';
 import config_settings from '../config/index.js';
+import { validateSession } from '../services/authService.js';
 
 // =============================================================================
 // TYPES
@@ -18,6 +19,7 @@ export interface AuthenticatedRequest extends Request {
     role: UserRole;
     walletAddress?: string;
   };
+  requestId?: string;
 }
 
 // =============================================================================
@@ -51,13 +53,19 @@ export class AppError extends Error {
  */
 export function errorHandler(
   err: Error | AppError,
-  _req: Request,
+  req: AuthenticatedRequest,
   res: Response<ApiResponse<null>>,
   _next: NextFunction
 ): void {
-  // Log error for debugging
-  const traceId = generateTraceId();
-  console.error(`[${traceId}] Error:`, err);
+  // Use request ID if available
+  const requestId = req.requestId || generateTraceId();
+  
+  // Log error for debugging (never log the full error in production)
+  if (config_settings.isDevelopment) {
+    console.error(`[${requestId}] Error:`, err);
+  } else {
+    console.error(`[${requestId}] Error: ${err.message}`);
+  }
 
   // Determine status code and error details
   const statusCode = err instanceof AppError ? err.statusCode : 500;
@@ -72,7 +80,7 @@ export function errorHandler(
   const error: ApiError = {
     code,
     message,
-    details: config_settings.isDevelopment ? { ...details, traceId } : undefined,
+    details: config_settings.isDevelopment ? { ...details, requestId } : { requestId },
   };
 
   res.status(statusCode).json({
@@ -85,14 +93,17 @@ export function errorHandler(
  * 404 Not Found handler
  */
 export function notFoundHandler(
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response<ApiResponse<null>>
 ): void {
+  const requestId = req.requestId || generateTraceId();
+  
   res.status(404).json({
     success: false,
     error: {
       code: 'NOT_FOUND',
       message: `Route ${req.method} ${req.path} not found`,
+      details: { requestId },
     },
   });
 }
@@ -111,9 +122,6 @@ function generateTraceId(): string {
 /**
  * Authentication middleware
  * Validates JWT token and populates req.user
- * 
- * TODO: Implement actual JWT validation
- * Currently returns a mock user for development
  */
 export function authenticate(
   req: AuthenticatedRequest,
@@ -128,6 +136,7 @@ export function authenticate(
       error: {
         code: 'UNAUTHORIZED',
         message: 'Missing or invalid authorization header',
+        details: { requestId: req.requestId },
       },
     });
     return;
@@ -135,8 +144,20 @@ export function authenticate(
 
   const token = authHeader.substring(7);
 
-  // TODO: Implement actual JWT verification
-  // For development, accept any token and return mock user
+  // Validate JWT token
+  const sessionData = validateSession(token);
+  
+  if (sessionData) {
+    req.user = {
+      id: sessionData.userId,
+      email: sessionData.email,
+      role: sessionData.role,
+    };
+    next();
+    return;
+  }
+
+  // In development mode, allow any token for testing
   if (config_settings.isDevelopment && token) {
     req.user = {
       id: 'user_dev_001',
@@ -147,13 +168,12 @@ export function authenticate(
     return;
   }
 
-  // In production, verify the JWT
-  // TODO: Implement JWT verification with jsonwebtoken or similar
   res.status(401).json({
     success: false,
     error: {
       code: 'UNAUTHORIZED',
       message: 'Invalid or expired token',
+      details: { requestId: req.requestId },
     },
   });
 }
@@ -172,9 +192,16 @@ export function optionalAuth(
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
     
-    // TODO: Implement actual JWT verification
-    // For development, accept any token
-    if (config_settings.isDevelopment && token) {
+    const sessionData = validateSession(token);
+    
+    if (sessionData) {
+      req.user = {
+        id: sessionData.userId,
+        email: sessionData.email,
+        role: sessionData.role,
+      };
+    } else if (config_settings.isDevelopment && token) {
+      // Development fallback
       req.user = {
         id: 'user_dev_001',
         email: 'dev@audifi.io',
@@ -188,6 +215,7 @@ export function optionalAuth(
 
 /**
  * Role-based access control middleware
+ * Requires authentication and checks if user has one of the allowed roles
  */
 export function requireRole(...allowedRoles: UserRole[]) {
   return (
@@ -201,6 +229,7 @@ export function requireRole(...allowedRoles: UserRole[]) {
         error: {
           code: 'UNAUTHORIZED',
           message: 'Authentication required',
+          details: { requestId: req.requestId },
         },
       });
       return;
@@ -212,6 +241,11 @@ export function requireRole(...allowedRoles: UserRole[]) {
         error: {
           code: 'FORBIDDEN',
           message: 'Insufficient permissions for this action',
+          details: { 
+            requestId: req.requestId,
+            requiredRoles: allowedRoles,
+            userRole: req.user.role,
+          },
         },
       });
       return;
@@ -227,14 +261,18 @@ export function requireRole(...allowedRoles: UserRole[]) {
 
 /**
  * Request logging middleware
+ * Adds request ID and logs request details
  */
 export function requestLogger(
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): void {
   const start = Date.now();
   const requestId = generateTraceId();
+
+  // Attach request ID to request object
+  req.requestId = requestId;
 
   // Add request ID to response headers
   res.setHeader('X-Request-ID', requestId);
@@ -243,9 +281,11 @@ export function requestLogger(
     const duration = Date.now() - start;
     const logLevel = res.statusCode >= 400 ? 'warn' : 'info';
     
-    console[logLevel === 'warn' ? 'warn' : 'log'](
-      `[${requestId}] ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`
-    );
+    if (logLevel === 'warn') {
+      console.warn(`[${requestId}] ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`);
+    } else {
+      console.log(`[${requestId}] ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`);
+    }
   });
 
   next();
@@ -259,7 +299,7 @@ export function requestLogger(
  * Request body validation middleware using Zod schemas
  */
 export function validateBody<T>(schema: { parse: (data: unknown) => T }) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     try {
       req.body = schema.parse(req.body);
       next();
@@ -269,7 +309,7 @@ export function validateBody<T>(schema: { parse: (data: unknown) => T }) {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid request body',
-          details: config_settings.isDevelopment ? { error } : undefined,
+          details: config_settings.isDevelopment ? { error, requestId: req.requestId } : { requestId: req.requestId },
         },
       });
     }
@@ -280,7 +320,7 @@ export function validateBody<T>(schema: { parse: (data: unknown) => T }) {
  * Request query validation middleware using Zod schemas
  */
 export function validateQuery<T>(schema: { parse: (data: unknown) => T }) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     try {
       // Parse and validate, but don't reassign to req.query
       // The validated data can be accessed via res.locals if needed
@@ -292,7 +332,7 @@ export function validateQuery<T>(schema: { parse: (data: unknown) => T }) {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid query parameters',
-          details: config_settings.isDevelopment ? { error } : undefined,
+          details: config_settings.isDevelopment ? { error, requestId: req.requestId } : { requestId: req.requestId },
         },
       });
     }

@@ -1,227 +1,260 @@
-# AudiFi
+# AudiFi (NFT Tracks)
 
-**AudiFi** is a Web3 platform that empowers independent music artists to launch Master IPOs, giving fans the opportunity to own fractional NFT shares of their favorite tracks. Artists retain control, earn automatic dividends, and build direct relationships with their supporters.
-
-> Own Your Music. Share the Success.
+**AudiFi** is a Web3 platform for independent music artists to mint their tracks as NFTs, retain full ownership, and earn perpetual royalties through the innovative "Mover Advantage" system.
 
 ## 🎵 Overview
 
-AudiFi enables artists to:
-- **Launch Master IPOs** - Sell NFT shares of music masters to fans
-- **V Studio Sessions** - Bring fans into the creative process with live production sessions
-- **Automatic Dividends** - NFT holders receive payouts when masters generate revenue
-- **Mover Advantage** - Early supporters earn royalties on every resale (10%/5%/3%/1%)
+AudiFi empowers artists to:
+- Upload music tracks and artwork
+- Configure release metadata (genre, BPM, mood, description)
+- Mint tracks as NFTs with fractional ownership (Master IPO)
+- Earn automatic royalties on all secondary market resales
+- Engage fans through V Studio interactive sessions
 
-This is the **frontend application** built with React 19 + TypeScript, featuring mock APIs and integration placeholders for future Web3 and payment infrastructure.
+This repository contains:
+- **Frontend:** React + TypeScript SPA in `/src`
+- **Backend:** Node.js/Express API in `/server`
+- **Database:** Drizzle ORM schemas in `/db`
+- **Infrastructure:** Docker/Kubernetes configs in `/deploy`
 
 ## 🚀 Quick Start
 
-### Installation
+### Prerequisites
+
+- Node.js 20+
+- PostgreSQL 16+
+- Docker (optional, for containerized deployment)
+
+### Frontend Setup
 
 ```bash
 npm install
-```
-
-### Development
-
-```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173` (or the port shown in your terminal).
+The app will be available at `http://localhost:5173`.
 
-### Build for Production
+### Backend Setup
 
 ```bash
-npm run build
+cd server
+npm install
+npm run dev
+```
+
+The API will be available at `http://localhost:3001`.
+
+### Environment Variables
+
+Copy the example env files and configure:
+
+```bash
+# Root (frontend)
+cp .env.example .env
+
+# Server (backend)
+cp server/.env.example server/.env
+```
+
+Required backend environment variables:
+- `DATABASE_URL` - PostgreSQL connection string
+- `JWT_SECRET` - Secret for JWT token signing (min 32 chars)
+- `SENDGRID_API_KEY` - For magic link emails (optional in development)
+
+### Database Setup
+
+```bash
+cd server
+
+# Generate migrations from schema
+npm run db:generate
+
+# Apply migrations to database
+npm run db:migrate
+
+# Or push schema directly (development)
+npm run db:push
 ```
 
 ## 📁 Project Structure
 
 ```
-src/
-├── api/                    # Mock API layer
-│   ├── user.ts            # User data operations
-│   ├── tracks.ts          # Track CRUD operations
-│   ├── masterIPO.ts       # Master IPO operations
-│   ├── subscription.ts    # Subscription/pricing data
-│   └── marketplace.ts     # Marketplace listings and purchases
-├── components/
-│   ├── layout/            # Layout components
-│   │   ├── MainLayout.tsx # Main app layout with nav
-│   │   └── NavBar.tsx     # Landing page navigation
-│   ├── audio/             # Audio components
-│   │   └── AudioPlayer.tsx # Custom audio player
-│   ├── dashboard/         # Dashboard-specific components
-│   │   ├── StatCard.tsx   # Stats display with earnings variant
-│   │   └── StatCardSkeleton.tsx # Loading skeleton
-│   ├── tracks/            # Track-related components
-│   │   ├── TrackCard.tsx
-│   │   ├── MarketplaceTrackCard.tsx
-│   │   ├── MarketplaceFilters.tsx
-│   │   ├── TrackCardSkeleton.tsx
-│   │   └── PurchaseModal.tsx
-│   ├── profile/           # Profile components
-│   └── ui/                # shadcn UI components
-├── pages/                 # Route pages
-│   ├── LandingPage.tsx    # Home page with hero
-│   ├── DashboardPage.tsx  # Artist dashboard
-│   ├── MarketplacePage.tsx # NFT marketplace
-│   ├── TrackDetailPage.tsx # Individual track view
-│   ├── artist/            # Artist-specific pages
-│   ├── fan/               # Fan portal pages
-│   ├── vstudio/           # V Studio pages
-│   └── master-ipo/        # Master IPO pages
-├── types/                 # TypeScript type definitions
-├── App.tsx               # Root app with routing
-├── index.css             # CSS variables and base styles
-└── main.css              # Tailwind imports and theme mapping
+├── src/                       # Frontend React application
+│   ├── api/                   # API client layer
+│   ├── components/            # React components
+│   ├── pages/                 # Route pages
+│   └── types/                 # TypeScript types
+├── server/                    # Backend Node.js/Express API
+│   ├── src/
+│   │   ├── config/            # Configuration
+│   │   ├── db/                # Database client & schema
+│   │   ├── middleware/        # Express middleware
+│   │   ├── routes/            # API routes
+│   │   └── services/          # Business logic
+│   ├── Dockerfile             # Backend container image
+│   └── drizzle.config.ts      # Drizzle Kit configuration
+├── db/                        # Shared database schemas
+│   └── schema/                # Drizzle ORM table definitions
+├── deploy/                    # Infrastructure configs
+│   ├── docker-compose.yml.example
+│   └── Caddyfile.example
+└── docs/                      # Documentation
 ```
 
-## 🎯 Main User Flows
+## 🔐 Authentication
 
-### 1. Landing Page (`/`)
-- Hero section with Master IPO value proposition
-- Feature showcase (Master IPO, V Studio, Mover Advantage, Dividends)
-- Call-to-action buttons
+AudiFi uses JWT-based authentication with magic link passwordless login:
 
-### 2. Artist Dashboard (`/artist`)
-- Overview stats (total tracks, sales, royalties, supporters)
-- Draft and published track sections
-- Quick access to create new Master IPOs
+1. User requests magic link via email
+2. Token is stored in database with 15-minute expiry
+3. User clicks link, token is verified and consumed
+4. JWT access token (short-lived) + refresh token (30 days) issued
+5. Optional 2FA via TOTP (Google Authenticator compatible)
 
-### 3. Marketplace (`/marketplace/masters`)
-- Browse and discover Master IPOs from artists
-- Filter by genre, blockchain, and price
-- Multi-blockchain support (Ethereum/Solana)
-- Purchase NFT shares with wallet connection
+### Wallet Linking
 
-### 4. Track Detail Page (`/tracks/:id`)
-- Large cover art with audio player
-- Artist info, genre, BPM, mood tags
-- Ownership section with IPFS hash and blockchain badge
-- Economics section (royalty percent, secondary resale)
-- Activity section with event history
-- Purchase button for listed tracks
+Users can link Web3 wallets with signature verification:
+```
+POST /api/v1/auth/wallet
+{
+  "address": "0x...",
+  "chain": "ethereum",
+  "signature": "0x...",
+  "message": "Sign this message to link your wallet"
+}
+```
 
-### 5. Profile Page (`/profile`)
-- Artist profile customization
-- Social media and music platform links
-- Two-factor authentication setup
+## 🎯 Key Features
 
-### 6. Settings Page (`/settings`)
-- Account information
-- Wallet connection (MetaMask stub)
-- Security settings
+### Master IPO
+- Artists can create "Masters" (tracks/albums) and launch IPOs
+- Configurable supply (1 to 1,000,000 NFTs)
+- "Mover Advantage" system rewards early minters with perpetual royalties
 
-## 🎨 AudiFi Design System
+### V Studio
+- Interactive fan sessions during creative process
+- Decision points where fans vote on creative choices
+- Eligibility rules (NFT holders, coin holders, subscribers)
 
-### Colors (oklch)
-| Token | Value | Usage |
-|-------|-------|-------|
-| **Primary** | `oklch(0.48 0.20 295)` | Deep purple - creative/artistic brand |
-| **Secondary** | `oklch(0.58 0.14 210)` | Dark cyan - technical/blockchain accent |
-| **Accent** | `oklch(0.72 0.17 195)` | Bright cyan - CTAs and highlights |
-| **Warning** | `oklch(0.68 0.16 85)` | Warm amber - earnings/royalty displays |
-| **Background** | `oklch(0.14 0.015 260)` | Dark slate background |
+### Multi-Chain Support
+- Ethereum, Polygon, Base networks supported
+- Chain selection per IPO
+- Wallet linking per chain
 
-### Typography
-- **Font:** Inter (Google Fonts)
-- **Scale:** 12px (caption) → 14px (body) → 18px (h3) → 24px (h2) → 36px (h1)
+## 🧪 Development
 
-### Components
-Built with **shadcn/ui v4** components, customized for the music/crypto aesthetic:
-- **Skeleton loaders** for marketplace and dashboard loading states
-- **AudioPlayer** component for track playback
-- **TooltipProvider** for contextual help (royalty badges, blockchain info)
-- **Dialog/Modal** for purchase flows
-- **Sonner** for toast notifications
+### Running Tests
 
-### Motion
-- **Transitions:** 150-250ms with ease-out
-- **Hover effects:** Subtle lift and scale on cards (scale-[1.02])
-- **Shadows:** Accent-tinted shadows on hover
+```bash
+# Frontend
+npm test
 
-## 🔌 Mock APIs & Integrations
+# Backend
+cd server
+npm test
+```
 
-All data operations use mock APIs with simulated latency:
+### Type Checking
 
-### Mock APIs
-- `api/user.ts` - User profile management
-- `api/tracks.ts` - Track CRUD and minting simulation
-- `api/masterIPO.ts` - Master IPO operations
-- `api/marketplace.ts` - Marketplace listings and purchases
-- `api/dividends.ts` - Dividend tracking and claims
+```bash
+# Frontend
+npm run type-check
 
-### Integration Stubs
-- `lib/wallet.ts` - MetaMask connection placeholder
-- `lib/payments.ts` - Stripe checkout placeholder
+# Backend
+cd server
+npm run type-check
+```
 
-### Data Persistence
-Mock data is stored in `localStorage` for demo purposes. In production, this would connect to a real backend with Web3 integration.
+### Linting
 
-## 🧪 Tech Stack
+```bash
+# Frontend
+npm run lint
 
-- **Framework:** React 19 + TypeScript
-- **Routing:** React Router v7
-- **Styling:** Tailwind CSS v4
-- **UI Components:** shadcn/ui v4
-- **Icons:** Phosphor Icons
-- **Notifications:** Sonner
-- **Build Tool:** Vite
+# Backend
+cd server
+npm run lint
+```
 
 ## 🚀 Deployment
 
-### Production & Preview (Vercel)
+### Production Architecture
 
-The production frontend is deployed on **Vercel** via Git integration:
+```
+Internet
+    │
+    ├─▶ Vercel (audifi.io)
+    │       └── Frontend (React + Vite)
+    │
+    └─▶ Fly.io (audifi-api.fly.dev)
+            ├── Backend API (Express.js)
+            └── Fly Postgres (PostgreSQL 16)
+```
 
-- **Production:** Deploys automatically from the `main` branch to [audifi.io](https://audifi.io)
-- **Previews:** Each pull request gets an automatic preview deployment on Vercel
+### Backend Deployment (Fly.io)
 
-Vercel handles all production and preview deployments directly from the repository. No GitHub Actions workflow deploys to Vercel.
+The backend API is deployed to Fly.io. See [deploy/README.md](deploy/README.md) for full setup instructions.
 
-### Demo Site (GitHub Pages)
+```bash
+cd server
+flyctl deploy
+```
 
-A read-only demo build is deployed from the `demo` branch to **GitHub Pages**:
+Required secrets (set via `flyctl secrets set`):
+- `DATABASE_URL` - Auto-set when attaching Fly Postgres
+- `JWT_SECRET` - JWT signing key (min 32 chars)
+- `SENDGRID_API_KEY` - For magic link emails
 
-- **Demo URL:** Available at the repository's GitHub Pages URL
-- **Trigger:** Push to the `demo` branch only
-- **Purpose:** Showcase the frontend without Vercel infrastructure
+### Frontend Deployment (Vercel)
 
-To update the demo site, merge changes into the `demo` branch.
+The frontend is automatically deployed via Vercel on pushes to `main`.
 
-### CI Checks
+### Local Development (Docker Compose)
 
-The GitHub Actions workflow (`.github/workflows/frontend.yml`) runs on all PRs and pushes:
+For local development with Docker:
 
-- ESLint linting
-- TypeScript build
-- Production build verification
+```bash
+cp deploy/docker-compose.yml.example deploy/docker-compose.yml
+cp deploy/.env.example deploy/.env
+cd deploy
+docker compose up -d
+```
 
-CI must pass before merging PRs.
+## 📝 API Documentation
 
-## 🔮 Future Integration Points
+See [docs/api/overview.md](docs/api/overview.md) for full API reference.
 
-This frontend is designed for easy integration with:
+### Key Endpoints
 
-1. **Web3 Backend**
-   - MetaMask/WalletConnect integration
-   - Smart contract calls for Master IPOs and NFT transfers
-   - Multi-chain support (Ethereum, Solana)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/health` | GET | Health check with dependency status |
+| `/api/v1/auth/magic-link` | POST | Request magic link |
+| `/api/v1/auth/verify-magic-link` | POST | Verify and get tokens |
+| `/api/v1/auth/refresh` | POST | Refresh access token |
+| `/api/v1/masters` | GET/POST | List/create masters |
+| `/api/v1/masters/:id/ipo` | POST | Create IPO for master |
 
-2. **IPFS Storage**
-   - Audio and artwork storage
-   - NFT metadata JSON
+## 🔮 Tech Stack
 
-3. **Payment Processing**
-   - Stripe integration for fiat payments
-   - Crypto payment support
+### Frontend
+- React 19 + TypeScript
+- React Router v7
+- Tailwind CSS v4
+- shadcn/ui components
 
-4. **Backend API**
-   - Real REST/GraphQL endpoints
-   - Authentication and authorization
-   - Database persistence
+### Backend
+- Node.js 20 + TypeScript
+- Express.js
+- Drizzle ORM + PostgreSQL
+- JWT authentication
+- ethers.js for Web3
+
+### Infrastructure
+- **Frontend:** Vercel
+- **Backend API:** Fly.io
+- **Database:** Fly Postgres
+- **Local Dev:** Docker Compose
 
 ## 📄 License
 

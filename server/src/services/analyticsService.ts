@@ -190,7 +190,7 @@ export async function getMasterAnalyticsByArtist(
 /**
  * Get Master holder distribution
  */
-export async function getMasterHolderDistribution(masterId: string): Promise<{
+export async function getMasterHolderDistribution(_masterId: string): Promise<{
   singleHolders: number;
   multiHolders: number;
   topHolders: Array<{
@@ -318,8 +318,8 @@ export async function getVStudioAnalytics(sessionId: string): Promise<VStudioAna
  * Get aggregated V Studio analytics for an artist
  */
 export async function getArtistVStudioAnalytics(
-  artistId: string,
-  period: AnalyticsPeriod = 'all_time'
+  _artistId: string,
+  _period: AnalyticsPeriod = 'all_time'
 ): Promise<{
   totalSessions: number;
   totalViewers: number;
@@ -345,7 +345,7 @@ export async function getArtistVStudioAnalytics(
 /**
  * Get viewer engagement metrics for a session
  */
-export async function getSessionEngagementMetrics(sessionId: string): Promise<{
+export async function getSessionEngagementMetrics(_sessionId: string): Promise<{
   viewerRetentionCurve: Array<{ minute: number; percentage: number }>;
   chatMessagesPerMinute: Array<{ minute: number; count: number }>;
   peakMoments: Array<{ timestamp: string; event: string; viewers: number }>;

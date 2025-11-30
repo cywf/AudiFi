@@ -199,7 +199,7 @@ export async function updateArtistCoinMetrics(
  */
 export async function getTokenBalance(
   coinId: string,
-  walletAddress: string
+  _walletAddress: string
 ): Promise<{
   balance: string;
   balanceFormatted: string;
