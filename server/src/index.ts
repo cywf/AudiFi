@@ -81,9 +81,9 @@ app.use(errorHandler);
 // SERVER STARTUP
 // =============================================================================
 
-const PORT = config_settings.server.port;
+const PORT = Number(process.env.PORT) || config_settings.server.port || 8080;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════════╗
 ║                    AudiFi Backend Server                       ║
