@@ -121,7 +121,7 @@ jobs:
         working-directory: server
         run: npx drizzle-kit migrate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
@@ -187,7 +187,7 @@ jobs:
         working-directory: server
         run: npx drizzle-kit migrate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
