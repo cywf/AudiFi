@@ -12,17 +12,53 @@ AudiFi empowers artists to:
 - Engage fans through V Studio interactive sessions
 
 This repository contains:
-- **Frontend:** React + TypeScript SPA in `/src`
-- **Backend:** Node.js/Express API in `/server`
-- **Database:** Drizzle ORM schemas in `/db`
+- **Frontend:** React + TypeScript SPA in `/src` (deployed to Vercel)
+- **Backend:** Node.js/Express API in `/server` (deployed to Fly.io)
+- **Database:** Drizzle ORM schemas in `/db` (Neon PostgreSQL)
 - **Infrastructure:** Docker/Kubernetes configs in `/deploy`
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              INTERNET                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+                    │                               │
+                    ▼                               ▼
+    ┌───────────────────────────┐   ┌───────────────────────────────────┐
+    │     Vercel (Frontend)      │   │       Fly.io (Backend API)        │
+    │     https://audifi.io      │   │   https://audifi-api.fly.dev      │
+    │                            │   │                                   │
+    │  • React + Vite            │   │  • Node.js + Express              │
+    │  • Static assets           │   │  • REST API                       │
+    │  • Client-side only        │──▶│  • Authentication                 │
+    │  • NO database access      │   │  • Business logic                 │
+    └───────────────────────────┘   └───────────────────────────────────┘
+                                                    │
+                                                    ▼
+                                    ┌───────────────────────────────────┐
+                                    │      Neon (PostgreSQL)            │
+                                    │   host.neon.tech:5432             │
+                                    │                                   │
+                                    │  • Serverless Postgres            │
+                                    │  • Auto-scaling                   │
+                                    │  • SSL required                   │
+                                    │  • Drizzle ORM                    │
+                                    └───────────────────────────────────┘
+```
+
+### Key Separation Points
+
+1. **Frontend (Vercel)**: Static React app, no database access
+2. **Backend (Fly.io)**: Express API, sole database accessor
+3. **Database (Neon)**: PostgreSQL with SSL, accessed only by backend
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js 20+
-- PostgreSQL 16+
+- Neon PostgreSQL database (https://neon.tech)
 - Docker (optional, for containerized deployment)
 
 ### Frontend Setup
@@ -56,12 +92,22 @@ cp .env.example .env
 cp server/.env.example server/.env
 ```
 
-Required backend environment variables:
-- `DATABASE_URL` - PostgreSQL connection string
+**Frontend environment variables:** (`.env`)
+- `VITE_API_URL` - Backend API URL (e.g., `http://localhost:3001`)
+- `VITE_WS_URL` - WebSocket URL for real-time features
+
+**Backend environment variables:** (`server/.env`)
+- `DATABASE_URL` - Neon PostgreSQL connection string (required)
 - `JWT_SECRET` - Secret for JWT token signing (min 32 chars)
 - `SENDGRID_API_KEY` - For magic link emails (optional in development)
 
-### Database Setup
+> ⚠️ **Important**: `DATABASE_URL` should NEVER be set in the frontend environment.
+
+### Database Setup (Neon)
+
+1. Create a free database at [Neon](https://neon.tech)
+2. Copy your connection string from the Neon dashboard
+3. Set `DATABASE_URL` in `server/.env`
 
 ```bash
 cd server
@@ -79,25 +125,31 @@ npm run db:push
 ## 📁 Project Structure
 
 ```
-├── src/                       # Frontend React application
-│   ├── api/                   # API client layer
+├── src/                       # Frontend React application (Vercel)
+│   ├── api/                   # API client layer (calls Fly.io backend)
 │   ├── components/            # React components
 │   ├── pages/                 # Route pages
 │   └── types/                 # TypeScript types
-├── server/                    # Backend Node.js/Express API
+├── server/                    # Backend Node.js/Express API (Fly.io)
 │   ├── src/
-│   │   ├── config/            # Configuration
-│   │   ├── db/                # Database client & schema
+│   │   ├── config/            # Configuration + env validation
+│   │   │   ├── index.ts       # Main config
+│   │   │   └── env.ts         # Environment variable handling
+│   │   ├── db/                # Database client (Neon) & schema
 │   │   ├── middleware/        # Express middleware
 │   │   ├── routes/            # API routes
 │   │   └── services/          # Business logic
 │   ├── Dockerfile             # Backend container image
+│   ├── fly.toml               # Fly.io deployment config
 │   └── drizzle.config.ts      # Drizzle Kit configuration
-├── db/                        # Shared database schemas
+├── db/                        # Shared database schemas (Neon)
 │   └── schema/                # Drizzle ORM table definitions
 ├── deploy/                    # Infrastructure configs
 │   ├── docker-compose.yml.example
 │   └── Caddyfile.example
+├── .github/workflows/         # CI/CD pipelines
+│   ├── backend.yml            # Backend tests + Fly.io deployment
+│   └── frontend.yml           # Frontend tests + Vercel deployment
 └── docs/                      # Documentation
 ```
 
@@ -180,34 +232,42 @@ npm run lint
 
 ### Production Architecture
 
-```
-Internet
-    │
-    ├─▶ Vercel (audifi.io)
-    │       └── Frontend (React + Vite)
-    │
-    └─▶ Fly.io (audifi-api.fly.dev)
-            ├── Backend API (Express.js)
-            └── Fly Postgres (PostgreSQL 16)
-```
+| Component | Platform | URL |
+|-----------|----------|-----|
+| Frontend | Vercel | https://audifi.io |
+| Backend API | Fly.io | https://audifi-api.fly.dev |
+| Database | Neon | (internal connection) |
 
 ### Backend Deployment (Fly.io)
 
-The backend API is deployed to Fly.io. See [deploy/README.md](deploy/README.md) for full setup instructions.
+The backend API is deployed to Fly.io via GitHub Actions.
 
+**Required GitHub Secrets:**
+- `DATABASE_URL` - Neon PostgreSQL connection string
+- `FLY_API_TOKEN` - Fly.io API token
+- `FLY_APP_STAGING` - Staging app name
+- `FLY_APP_PRODUCTION` - Production app name
+
+**Manual deployment:**
 ```bash
 cd server
 flyctl deploy
 ```
 
-Required secrets (set via `flyctl secrets set`):
-- `DATABASE_URL` - Auto-set when attaching Fly Postgres
-- `JWT_SECRET` - JWT signing key (min 32 chars)
-- `SENDGRID_API_KEY` - For magic link emails
+**Required Fly.io secrets:**
+```bash
+flyctl secrets set DATABASE_URL=postgresql://...@host.neon.tech:5432/db
+flyctl secrets set JWT_SECRET=your-jwt-secret
+flyctl secrets set SENDGRID_API_KEY=your-sendgrid-key
+```
 
 ### Frontend Deployment (Vercel)
 
-The frontend is automatically deployed via Vercel on pushes to `main`.
+The frontend is automatically deployed via Vercel Git integration.
+
+**Environment Variables (Vercel Dashboard):**
+- `VITE_API_URL` - Backend API URL (e.g., `https://api.audifi.io`)
+- `VITE_WS_URL` - WebSocket URL
 
 ### Local Development (Docker Compose)
 
@@ -246,14 +306,14 @@ See [docs/api/overview.md](docs/api/overview.md) for full API reference.
 ### Backend
 - Node.js 20 + TypeScript
 - Express.js
-- Drizzle ORM + PostgreSQL
+- Drizzle ORM + Neon PostgreSQL
 - JWT authentication
 - ethers.js for Web3
 
 ### Infrastructure
 - **Frontend:** Vercel
 - **Backend API:** Fly.io
-- **Database:** Fly Postgres
+- **Database:** Neon (PostgreSQL)
 - **Local Dev:** Docker Compose
 
 ## 📄 License

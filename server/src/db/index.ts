@@ -2,6 +2,9 @@
  * AudiFi Database Client
  * 
  * Configures and exports the Drizzle ORM database client for the server.
+ * Uses Neon (PostgreSQL) as the primary database provider.
+ * 
+ * Connection is established via DATABASE_URL with SSL enabled for Neon.
  * Uses inline schema definitions mirroring the shared db/schema.
  * 
  * NOTE: In production, consider using a shared package for schema.
@@ -12,7 +15,7 @@ import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { pgTable, uuid, varchar, text, timestamp, boolean, index, uniqueIndex, integer, numeric, pgEnum, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import config_settings from '../config/index.js';
+import { envConfig } from '../config/index.js';
 
 // =============================================================================
 // ENUMS
@@ -345,30 +348,43 @@ export const schema = {
 };
 
 // =============================================================================
-// DATABASE CLIENT
+// DATABASE CLIENT (Neon PostgreSQL)
 // =============================================================================
 
-// Get connection string from environment
-const connectionString = config_settings.database.url;
+// Get connection string from environment config (includes sslmode=require for Neon)
+const connectionString = envConfig.dbUrl;
 
-// Create postgres connection pool
+// Create postgres connection pool with Neon-compatible settings
 let sql: postgres.Sql | null = null;
 let db: PostgresJsDatabase<typeof schema> | null = null;
 
 if (connectionString) {
   sql = postgres(connectionString, {
+    // Connection pool settings optimized for Neon serverless
     max: 10,
     idle_timeout: 20,
     connect_timeout: 10,
+    // Neon requires SSL for all connections (handled in connection string via sslmode=require)
   });
   
   db = drizzle(sql, { schema });
-} else if (!config_settings.isTest) {
+  
+  // Note: postgres.js uses lazy connection - actual DB connection happens on first query
+  // Use isDatabaseReady() to verify connectivity after initialization
+  if (!envConfig.isTest) {
+    console.log('✅ Database client configured (Neon PostgreSQL)');
+  }
+} else if (!envConfig.isTest) {
   console.warn(`⚠️  DATABASE_URL not set. Database features will be disabled.
-  To configure the database:
-  1. Copy server/.env.example to server/.env
-  2. Set DATABASE_URL=postgresql://user:password@localhost:5432/audifi
-  3. Run 'npm run db:push' to create tables
+  
+  To configure the Neon database:
+  1. Create a database at https://neon.tech
+  2. Copy the connection string from your Neon dashboard
+  3. Set DATABASE_URL in your .env file:
+     DATABASE_URL=postgresql://user:password@host.neon.tech:5432/database
+  4. For Fly.io, set via: flyctl secrets set DATABASE_URL=...
+  5. Run 'npm run db:push' to create tables
+  
   See README.md for full setup instructions.`);
 }
 
@@ -412,7 +428,11 @@ export async function isDatabaseReady(): Promise<boolean> {
  */
 export function getDb(): PostgresJsDatabase<typeof schema> {
   if (!db) {
-    throw new Error('Database not connected. Check DATABASE_URL environment variable.');
+    throw new Error(
+      'Database not connected. Check DATABASE_URL environment variable.\n' +
+      'For Neon connections, ensure your DATABASE_URL is set correctly:\n' +
+      'DATABASE_URL=postgresql://user:password@host.neon.tech:5432/database'
+    );
   }
   return db;
 }

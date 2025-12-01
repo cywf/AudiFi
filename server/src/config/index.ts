@@ -1,10 +1,14 @@
 /**
  * AudiFi Backend Configuration
  * Centralized configuration management with environment variable loading
+ * 
+ * Database connections use Neon (PostgreSQL) via DATABASE_URL.
+ * See ./env.ts for environment variable validation.
  */
 
 import { config } from 'dotenv';
 import { z } from 'zod';
+import { envConfig } from './env.js';
 
 // Load environment variables
 config();
@@ -116,7 +120,7 @@ export const config_settings = {
   },
 
   database: {
-    url: env.DATABASE_URL,
+    url: envConfig.dbUrl,
   },
 
   auth: {
@@ -199,5 +203,8 @@ export const config_settings = {
 } as const;
 
 export type Config = typeof config_settings;
+
+// Re-export envConfig for direct access to validated environment variables
+export { envConfig } from './env.js';
 
 export default config_settings;

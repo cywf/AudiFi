@@ -2,12 +2,14 @@
 # AudiFi Backend API - Fly.io Configuration
 #
 # This configuration deploys the backend API to Fly.io.
-# Database is managed via Fly Postgres.
+# Database is managed via Neon PostgreSQL (external service).
 #
 # Usage:
-#   - Set FLY_APP env/secret for app name
-#   - Set DATABASE_URL via `fly secrets set DATABASE_URL=...`
+#   - Set DATABASE_URL via `fly secrets set DATABASE_URL=<neon-connection-string>`
 #   - Deploy with `flyctl deploy`
+#
+# IMPORTANT: DATABASE_URL must be set as a Fly.io secret before deployment.
+#            Get your connection string from the Neon dashboard.
 # =============================================================================
 
 app = "audifi-api"
@@ -41,5 +43,6 @@ primary_region = "iad"
   cpus = 1
 
 # Run database migrations before starting the app
+# Migrations connect to Neon PostgreSQL via DATABASE_URL secret
 [deploy]
   release_command = "npm run db:migrate"
